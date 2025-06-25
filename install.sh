@@ -101,9 +101,7 @@ install_pnpm() {
 }
 
 # Configure vim for better development experience
-    install_vscode
-    install_vscode_extensions() {
-    print_status "Configuring vim for development..."
+    
     
     # Create basic .vimrc for better coding experience
     cat > ~/.vimrc << 'EOF'
