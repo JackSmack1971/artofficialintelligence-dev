@@ -144,7 +144,7 @@ autocmd BufNewFile,BufRead *.js set filetype=javascript
 EOF
     
     print_success "vim configured for development"
-}
+
 
 # Install Git and configure basics
 setup_git() {
