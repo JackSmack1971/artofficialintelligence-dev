@@ -379,7 +379,6 @@ main() {
     install_dev_tools
     install_nodejs
     install_pnpm
-    configure_vim
     setup_git
     create_project_structure
     setup_environment
