@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express'
+import rateLimit from 'express-rate-limit'
 import crypto from 'crypto'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -8,6 +9,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
   const app = express()
+
+  // Rate limiter: maximum of 100 requests per 15 minutes
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+  })
 
   app.use((_req: Request, res: Response, next: NextFunction) => {
     res.locals.nonce = crypto.randomBytes(16).toString('base64')
@@ -23,7 +30,7 @@ export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
     next()
   })
 
-  app.get('/', async (_req: Request, res: Response, next: NextFunction) => {
+  app.get('/', limiter, async (_req: Request, res: Response, next: NextFunction) => {
     try {
       const indexPath = path.join(distDir, 'index.html')
       let html = await fs.readFile(indexPath, 'utf8')
