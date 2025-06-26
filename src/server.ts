@@ -3,7 +3,7 @@ import rateLimit from 'express-rate-limit'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { promises as fs } from 'fs'
-import { securityMiddleware } from './server/security'
+import { securityMiddleware } from './server/security.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 

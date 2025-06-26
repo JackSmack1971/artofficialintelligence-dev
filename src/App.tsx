@@ -1,8 +1,10 @@
-import React from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Home from '@/pages/Home'
-import About from '@/pages/About'
-import NotFound from '@/pages/NotFound'
+import React, { Suspense, useEffect } from 'react'
+import { Routes, Route } from 'react-router-dom'
+import { lazyWithPreload } from '@/lib/lazyWithPreload'
+import LoadingSpinner from '@/components/LoadingSpinner'
+const Home = lazyWithPreload(() => import('@/pages/Home'))
+const About = lazyWithPreload(() => import('@/pages/About'))
+const NotFound = lazyWithPreload(() => import('@/pages/NotFound'))
 import { Header } from '@/components/layout/Header'
 import { NAVIGATION } from '@/data/navigation'
 import { validateNavigation } from '@/lib/validation'
@@ -10,15 +12,21 @@ import { validateNavigation } from '@/lib/validation'
 export const App: React.FC = () => {
   const navigation = validateNavigation(NAVIGATION)
 
+  useEffect(() => {
+    void Home.preload()
+  }, [])
+
   return (
-    <BrowserRouter>
+    <>
       <Header navigation={navigation} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </>
   )
 }
 
