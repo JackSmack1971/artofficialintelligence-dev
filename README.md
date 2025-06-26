@@ -57,4 +57,5 @@ We follow a trunk-based workflow:
 - **Feature branches** should be short-lived and descriptively named.
 - **Commits** use conventional messages and represent atomic changes.
 - **Pre-commit** hooks run automated linting, formatting and type checks.
+- `pnpm test` runs `vitest run --coverage` to generate a coverage report and exit after one run.
 Please ensure all pull requests pass `pnpm lint`, `pnpm test`, and `pnpm build` before merging.
