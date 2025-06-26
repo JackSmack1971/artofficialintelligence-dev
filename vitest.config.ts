@@ -13,7 +13,7 @@ export default defineConfig({
         'src/lib/**/*.ts',
         'src/server.ts'
       ],
-      exclude: []
+      exclude: ['src/components/ui/index.ts']
     }
   }
 })
