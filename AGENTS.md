@@ -168,6 +168,33 @@ grep -r "TODO" src/   # Find development notes
 - **Bundle Analysis**: Size tracking, unused code detection
 - **Error Tracking**: JavaScript error monitoring
 
+
+## Project Context
+- Modern React 18 application with TypeScript
+- Uses Vite for build tooling and development
+- Tailwind CSS for styling with custom design system
+- Vitest for testing infrastructure
+- ESLint + Prettier for code quality
+
+## Development Standards
+- Strict TypeScript configuration must be maintained
+- All components should be functional with proper TypeScript interfaces
+- Follow existing code patterns for consistency
+- Maintain security-first approach with CSP compliance
+- Performance optimizations should not compromise code readability
+
+## Testing Requirements
+- All new features must include unit tests
+- Integration tests for user workflows
+- Accessibility testing for all UI components
+- Error handling tests for boundary conditions
+
+## Security Guidelines
+- Never weaken existing CSP policies
+- All user inputs must be properly validated
+- Follow secure coding practices for React applications
+- Maintain principle of least privilege in configurations
+- 
 ### Success Metrics
 - **Performance**: All Core Web Vitals in "Good" range
 - **Accessibility**: 100% automated test pass rate
