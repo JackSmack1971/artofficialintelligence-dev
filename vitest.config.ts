@@ -5,6 +5,7 @@ export default defineConfig({
   resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
   test: {
     environment: 'jsdom',
+    setupFiles: ['./tests/setup/integration-setup.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
