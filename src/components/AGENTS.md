@@ -343,7 +343,9 @@ ArticleCard.displayName = 'ArticleCard'
 
 ### Error Boundary Implementation
 
-#### ErrorBoundary.tsx
+#### src/components/ErrorBoundary.tsx
+
+This file logs errors with structured data and displays an AI-themed fallback UI.
 ```typescript
 import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { Button } from '@/components/ui/Button'
