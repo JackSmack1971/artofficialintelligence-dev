@@ -3,7 +3,7 @@ import request from 'supertest'
 import { promises as fs } from 'fs'
 import path from 'path'
 import os from 'os'
-import { createServer } from '../src/server'
+import { createServer, startServer } from '../src/server'
 
 let tmpDir: string
 
@@ -26,5 +26,23 @@ describe('server nonce', () => {
     expect(nonceMatch).toBeTruthy()
     const nonce = nonceMatch![1]
     expect(res.text).toContain(`nonce="${nonce}"`)
+    expect(csp).toContain("default-src 'self'")
+    expect(csp).toContain('https://cdn.jsdelivr.net')
+    expect(csp).toContain('https://fonts.googleapis.com')
+    expect(csp).toContain('https://fonts.gstatic.com')
+    expect(csp).toContain('https://api.artofficial-intelligence.com')
+  })
+
+  it('returns 500 when index load fails', async () => {
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'nonce-test-'))
+    const app = createServer(tmpDir)
+    const res = await request(app).get('/')
+    expect(res.status).toBe(500)
+  })
+
+  it('startServer returns http.Server', async () => {
+    const server = startServer(0)
+    expect(server).toBeTruthy()
+    await new Promise((resolve) => server.close(resolve))
   })
 })
