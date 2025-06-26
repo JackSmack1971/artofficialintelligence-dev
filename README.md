@@ -37,6 +37,12 @@ pnpm test     # Vitest with coverage
 pnpm build    # Verify production build
 ```
 
+## Error Handling
+
+The global error boundary lives at `src/components/ErrorBoundary.tsx`.
+It logs caught errors with structured data (timestamp, message, component stack) and displays an AI-themed fallback screen when failures occur.
+
+
 ## Nonce-Based Content Security Policy
 
 The server generates a unique nonce for every request. This nonce replaces
