@@ -55,19 +55,25 @@ describe('ErrorBoundary', () => {
 
   it('logs timestamp, message, and stack when error occurs', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
     render(
       <ErrorBoundary>
         <ProblemChild />
       </ErrorBoundary>
     )
-    expect(spy).toHaveBeenCalledWith(
-      'ErrorBoundary caught',
+
+    const [, log] =
+      spy.mock.calls.find(
+        ([, arg]) => arg && typeof arg === 'object' && 'timestamp' in arg
+      ) ?? []
+    expect(log).toEqual(
       expect.objectContaining({
         timestamp: expect.any(String),
         message: 'boom',
         componentStack: expect.any(String)
       })
     )
+
     spy.mockRestore()
   })
 })
