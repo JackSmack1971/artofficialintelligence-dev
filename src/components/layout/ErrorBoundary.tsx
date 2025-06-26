@@ -36,6 +36,37 @@ export class ErrorBoundary extends Component<
     this.setState({ hasError: false, error: undefined, errorInfo: undefined })
   }
 
+  private renderFallback() {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900"
+        role="alert"
+        aria-live="assertive"
+      >
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            Something went wrong
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Please try again or refresh the page.
+          </p>
+          <div className="space-y-3">
+            <Button onClick={this.resetError} className="w-full">
+              Try Again
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => window.location.reload()}
+              className="w-full"
+            >
+              Refresh Page
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
@@ -45,34 +76,7 @@ export class ErrorBoundary extends Component<
         )
       }
 
-      return (
-        <div
-          className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900"
-          role="alert"
-          aria-live="assertive"
-        >
-          <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Something went wrong
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Please try again or refresh the page.
-            </p>
-            <div className="space-y-3">
-              <Button onClick={this.resetError} className="w-full">
-                Try Again
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => window.location.reload()}
-                className="w-full"
-              >
-                Refresh Page
-              </Button>
-            </div>
-          </div>
-        </div>
-      )
+      return this.renderFallback()
     }
 
     return this.props.children
