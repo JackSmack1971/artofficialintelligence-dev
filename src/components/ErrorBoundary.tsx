@@ -1,6 +1,9 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { Button } from '@/components/ui/Button'
 
+// NOTE: use this component via `@/components/ErrorBoundary`
+// Legacy path '@/components/layout/ErrorBoundary' has been removed.
+
 interface ErrorBoundaryState {
   hasError: boolean
   error?: Error
