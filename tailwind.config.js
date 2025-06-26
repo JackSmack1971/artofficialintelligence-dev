@@ -7,9 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        'ai-primary': '#3B82F6',
-        'ai-secondary': '#8B5CF6',
-        'ai-accent': '#10B981',
+        'ai-primary': 'hsl(var(--ai-primary))',
+        'ai-secondary': 'hsl(var(--ai-secondary))',
+        'ai-neural': 'hsl(var(--ai-neural))',
+        'ai-accent': 'hsl(var(--ai-accent))',
+        'ai-warning': 'hsl(var(--ai-warning))',
+        'ai-surface': 'hsl(var(--ai-surface))',
+        'ai-background': 'hsl(var(--ai-background))',
       }
     },
   },
