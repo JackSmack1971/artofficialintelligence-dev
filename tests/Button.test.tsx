@@ -1,6 +1,7 @@
-import { afterEach, describe, expect, it } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
+
 import { Button } from '@/components/ui/Button'
 
 afterEach(cleanup)

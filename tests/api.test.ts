@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { fetchWithRetry, ApiError } from '@/lib/api'
+
+import { ApiError, fetchWithRetry } from '@/lib/api'
 
 afterEach(() => {
   vi.restoreAllMocks()

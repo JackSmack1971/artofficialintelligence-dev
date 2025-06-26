@@ -65,3 +65,16 @@ We follow a trunk-based workflow:
 - **Pre-commit** hooks run automated linting, formatting and type checks.
 - `pnpm test` runs `vitest run --coverage` to generate a coverage report and exit after one run.
 Please ensure all pull requests pass `pnpm lint`, `pnpm test`, and `pnpm build` before merging.
+
+## Import Ordering
+
+All source files follow a standard import order enforced by ESLint:
+
+1. React and React related imports
+2. Third-party libraries (alphabetical)
+3. Internal components (`@/components`)
+4. Internal utilities (`@/lib`, `@/utils`, `@/types`)
+5. Relative imports (`./`)
+6. Type-only imports (last)
+
+Refer to [docs/import-ordering.md](docs/import-ordering.md) for more information.

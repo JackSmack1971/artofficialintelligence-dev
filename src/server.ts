@@ -1,8 +1,10 @@
-import express, { Request, Response, NextFunction } from 'express'
-import rateLimit from 'express-rate-limit'
+import { promises as fs } from 'fs'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
-import { promises as fs } from 'fs'
+
+import express, { NextFunction, Request, Response } from 'express'
+import rateLimit from 'express-rate-limit'
+
 import { securityMiddleware } from './server/security.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
