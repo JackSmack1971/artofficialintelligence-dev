@@ -37,6 +37,18 @@ pnpm test     # Vitest with coverage
 pnpm build    # Verify production build
 ```
 
+## Nonce-Based Content Security Policy
+
+The server generates a unique nonce for every request. This nonce replaces
+`__NONCE__` in `index.html` at runtime and is added to the `Content-Security-Policy`
+header. All inline scripts and styles must include the generated `nonce` attribute.
+Run the production server after building with:
+
+```bash
+pnpm build
+node src/server.js
+```
+
 ## Contribution Guidelines
 
 We follow a trunk-based workflow:

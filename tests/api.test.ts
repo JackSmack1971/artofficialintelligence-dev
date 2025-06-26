@@ -26,7 +26,7 @@ describe('fetchWithRetry', () => {
     vi.useFakeTimers()
     vi.stubGlobal(
       'fetch',
-      (_url, opts: { signal: AbortSignal }) =>
+      (_url: string, opts: { signal: AbortSignal }) =>
         new Promise((_resolve, reject) =>
           opts.signal.addEventListener('abort', () =>
             reject(new DOMException('Aborted', 'AbortError'))
