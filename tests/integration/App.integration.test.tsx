@@ -1,8 +1,11 @@
-import { describe, it, expect, vi } from 'vitest'
-import App from '@/App'
-import ErrorBoundary from '@/components/ErrorBoundary'
-import { render, screen, userEvent, waitFor } from '../utils/test-utils'
 import { axe } from 'jest-axe'
+import { describe, expect, it, vi } from 'vitest'
+
+import ErrorBoundary from '@/components/ErrorBoundary'
+
+import App from '@/App'
+
+import { render, screen, userEvent, waitFor } from '../utils/test-utils'
 
 const mockFetch = (response: unknown, ok = true) => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({

@@ -1,8 +1,10 @@
-import { afterEach, describe, expect, it } from 'vitest'
-import request from 'supertest'
 import { promises as fs } from 'fs'
-import path from 'path'
 import os from 'os'
+import path from 'path'
+
+import request from 'supertest'
+import { afterEach, describe, expect, it } from 'vitest'
+
 import { createServer, startServer } from '../src/server'
 
 let tmpDir: string

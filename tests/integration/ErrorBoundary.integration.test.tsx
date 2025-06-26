@@ -1,5 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import ErrorBoundary from '@/components/ErrorBoundary'
+
 import { render, screen, userEvent } from '../utils/test-utils'
 
 const ProblemChild = () => {

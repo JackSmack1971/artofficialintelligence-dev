@@ -1,8 +1,11 @@
-import { afterEach, describe, expect, it } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { MemoryRouter } from 'react-router-dom'
-import { render, screen, cleanup } from '@testing-library/react'
+
+import { cleanup, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
+
 import { Header } from '@/components/layout/Header'
+
 import { NAVIGATION } from '@/data/navigation'
 
 afterEach(cleanup)

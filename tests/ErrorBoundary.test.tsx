@@ -1,7 +1,9 @@
-import { describe, it, expect, vi } from 'vitest'
-import '@testing-library/jest-dom/vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
 import { useState } from 'react'
+
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+
 import ErrorBoundary from '@/components/ErrorBoundary'
 
 const ProblemChild = () => {
