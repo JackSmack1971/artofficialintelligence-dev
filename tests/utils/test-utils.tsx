@@ -1,17 +1,23 @@
-import type { FC, ReactElement } from 'react'
+import type { FC, PropsWithChildren, ReactElement } from 'react'
 
 import { MemoryRouter } from 'react-router-dom'
 
-import { render as rtlRender, screen, waitFor, type RenderOptions } from '@testing-library/react'
+import {
+  type RenderOptions,
+  render as rtlRender,
+  screen,
+  waitFor
+} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 interface WrapperProps {
   initialEntries?: string[]
 }
 
-const Providers: FC<WrapperProps> = ({ children, initialEntries }) => (
-  <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
-)
+const Providers: FC<PropsWithChildren<WrapperProps>> = ({
+  children,
+  initialEntries
+}) => <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
 
 export const customRender = (
   ui: ReactElement,
@@ -25,4 +31,3 @@ export const customRender = (
   })
 export { screen, waitFor }
 export { customRender as render, userEvent }
-
