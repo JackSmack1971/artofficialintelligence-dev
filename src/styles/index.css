@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --ai-primary: 220 80% 56%;
+  --ai-secondary: 270 70% 60%;
+  --ai-neural: 217 19% 27%;
+  --ai-accent: 146 80% 32%;
+  --ai-warning: 17 88% 40%;
+  --ai-surface: 210 40% 96%;
+  --ai-background: 210 40% 98%;
+}
+
+[data-theme="dark"],
+.dark {
+  --ai-primary: 213 95% 68%;
+  --ai-secondary: 270 100% 76%;
+  --ai-neural: 217 19% 85%;
+  --ai-accent: 146 70% 45%;
+  --ai-warning: 17 90% 50%;
+  --ai-surface: 217 33% 18%;
+  --ai-background: 222 47% 11%;
+}
