@@ -16,7 +16,18 @@ describe('App routing', () => {
       </MemoryRouter>
     )
     expect(
-      await screen.findByText(/Welcome to ArtOfficial Intelligence/)
+      await screen.findByRole('heading', { name: /artofficial intelligence/i })
+    ).toBeInTheDocument()
+  })
+
+  it('navigates to articles page', async () => {
+    render(
+      <MemoryRouter initialEntries={['/articles']}>
+        <App />
+      </MemoryRouter>
+    )
+    expect(
+      await screen.findByRole('heading', { name: /articles/i })
     ).toBeInTheDocument()
   })
 

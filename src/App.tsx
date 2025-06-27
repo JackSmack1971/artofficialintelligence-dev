@@ -19,6 +19,11 @@ const About = lazyWithPreload(() =>
     default: m.default as React.ComponentType<unknown>
   }))
 )
+const Articles = lazyWithPreload(() =>
+  import('@/pages/Articles').then((m) => ({
+    default: m.default as React.ComponentType<unknown>
+  }))
+)
 const NotFound = lazyWithPreload(() =>
   import('@/pages/NotFound').then((m) => ({
     default: m.default as React.ComponentType<unknown>
@@ -30,6 +35,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     void Home.preload()
+    void Articles.preload()
   }, [])
 
   return (
@@ -38,6 +44,7 @@ export const App: React.FC = () => {
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/articles" element={<Articles />} />
           <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
