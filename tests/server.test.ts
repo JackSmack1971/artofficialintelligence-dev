@@ -65,4 +65,21 @@ describe('server nonce', () => {
     expect(res.text).toContain('og:title')
     expect(res.text).toContain('twitter:card')
   })
+
+  it('injects analytics script with nonce', async () => {
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'nonce-test-'))
+    const rootIndex = await fs.readFile(
+      path.join(process.cwd(), 'index.html'),
+      'utf8'
+    )
+    await fs.writeFile(path.join(tmpDir, 'index.html'), rootIndex)
+    const app = createServer(tmpDir)
+    const res = await request(app).get('/')
+    expect(res.status).toBe(200)
+    const csp = res.headers['content-security-policy'] as string
+    const nonce = csp.match(/nonce-([^';]+)/)![1]
+    expect(res.text).toContain('data-domain="%VITE_PLAUSIBLE_DOMAIN%"')
+    expect(res.text).toContain('src="https://plausible.io/js/script.js"')
+    expect(res.text).toContain(`nonce="${nonce}"`)
+  })
 })
