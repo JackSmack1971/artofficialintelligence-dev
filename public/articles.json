@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1",
+    "title": "AI Breakthrough",
+    "excerpt": "A new AI model surpasses expectations.",
+    "author": "Jane Doe",
+    "image": "https://via.placeholder.com/400x200"
+  },
+  {
+    "id": "2",
+    "title": "Machine Learning Trends",
+    "excerpt": "Exploring upcoming trends in ML.",
+    "author": "John Smith",
+    "image": "https://via.placeholder.com/400x200"
+  },
+  {
+    "id": "3",
+    "title": "Robotics Advances",
+    "excerpt": "How robots are transforming industries.",
+    "author": "Alex Johnson",
+    "image": "https://via.placeholder.com/400x200"
+  }
+]
