@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { Link, useLocation } from 'react-router-dom'
 
 import { Button } from '@/components/ui/Button'
+import { Drawer } from '@/components/ui/Drawer'
 
 import type { NavigationItem } from '@/types/navigation'
 
@@ -39,20 +40,6 @@ export const Header: React.FC<HeaderProps> = React.memo(
       },
       [toggleMobile]
     )
-
-    useEffect(() => {
-      const handleEsc = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') {
-          setMobileOpen(false)
-        }
-      }
-      if (mobileOpen) {
-        document.addEventListener('keydown', handleEsc)
-      }
-      return () => {
-        document.removeEventListener('keydown', handleEsc)
-      }
-    }, [mobileOpen])
 
     const handleKeyDown = useCallback(
       (event: React.KeyboardEvent, href: string) => {
@@ -121,12 +108,8 @@ export const Header: React.FC<HeaderProps> = React.memo(
                   />
                 </svg>
               </Button>
-              {mobileOpen && (
-                <ul
-                  id="mobile-menu"
-                  role="menu"
-                  className="md:hidden mt-4 space-y-2"
-                >
+              <Drawer open={mobileOpen} onClose={() => setMobileOpen(false)}>
+                <ul id="mobile-menu" role="menu" className="p-4 space-y-2">
                   {items.map(({ href, label, isActive }) => (
                     <li key={href} role="none">
                       <Link
@@ -142,7 +125,7 @@ export const Header: React.FC<HeaderProps> = React.memo(
                     </li>
                   ))}
                 </ul>
-              )}
+              </Drawer>
             </div>
           </nav>
         </div>
