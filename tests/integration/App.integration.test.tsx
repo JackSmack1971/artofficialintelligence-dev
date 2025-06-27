@@ -27,7 +27,7 @@ const mockFetch = () => {
 
 describe('App integration', () => {
   it('renders home page and navigates', async () => {
-    mockFetch({ status: 'ok' })
+    mockFetch()
     render(
       <ErrorBoundary>
         <App />
@@ -43,13 +43,13 @@ describe('App integration', () => {
   })
 
   it('shows not found on unknown route', async () => {
-    mockFetch({ status: 'ok' })
+    mockFetch()
     render(<App />, { initialEntries: ['/missing'] })
     expect(await screen.findByText(/page not found/i)).toBeInTheDocument()
   })
 
   it('is accessible', async () => {
-    mockFetch({ status: 'ok' })
+    mockFetch()
     const { container } = render(<App />)
     await waitFor(() =>
       screen.getByRole('heading', { name: /artofficial intelligence/i })
