@@ -35,7 +35,13 @@ pnpm dev      # Start development server with hot reload
 pnpm lint     # ESLint + TypeScript checks
 pnpm test     # Vitest with coverage
 pnpm build    # Verify production build
+pnpm analyze  # Build with bundle analyzer enabled
 ```
+
+### Bundle Analysis
+
+Run `pnpm analyze` to create `dist/stats.html` using the bundle visualizer.
+Open the file in your browser to inspect the bundle composition.
 
 ## Error Handling
 
