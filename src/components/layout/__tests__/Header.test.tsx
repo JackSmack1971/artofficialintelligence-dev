@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 
 import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
 import { NAVIGATION } from '@/data/navigation'
@@ -32,5 +33,15 @@ describe('Header component', () => {
     renderHeader()
     const button = screen.getByRole('button', { name: /open navigation menu/i })
     expect(button).toHaveClass('md:hidden')
+  })
+
+  it('toggles menu with keyboard', async () => {
+    renderHeader()
+    const button = screen.getByRole('button', { name: /open navigation menu/i })
+    button.focus()
+    await userEvent.keyboard('{Enter}')
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
   })
 })
