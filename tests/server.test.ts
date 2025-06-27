@@ -47,4 +47,22 @@ describe('server nonce', () => {
     expect(server).toBeTruthy()
     await new Promise((resolve) => server.close(resolve))
   })
+
+  it('includes meta tags in served HTML', async () => {
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'nonce-test-'))
+    const rootIndex = await fs.readFile(
+      path.join(process.cwd(), 'index.html'),
+      'utf8'
+    )
+    await fs.writeFile(path.join(tmpDir, 'index.html'), rootIndex)
+    const app = createServer(tmpDir)
+    const res = await request(app).get('/')
+    expect(res.status).toBe(200)
+    const csp = res.headers['content-security-policy'] as string
+    const nonce = csp.match(/nonce-([^';]+)/)![1]
+    expect(res.text).toContain(`nonce="${nonce}"`)
+    expect(res.text).toContain('<meta name="description"')
+    expect(res.text).toContain('og:title')
+    expect(res.text).toContain('twitter:card')
+  })
 })
