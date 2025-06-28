@@ -1,0 +1,56 @@
+# Changelog
+
+All notable changes between 2025-06-24 and 2025-06-28.
+
+- PR #1 (2025-06-24): Setup React 18 Vite skeleton
+- PR #2 (2025-06-25): Add development workflow docs
+- PR #3 (2025-06-25): Add foundational components and router setup
+- PR #4 (2025-06-25): Add linting and testing tools
+- PR #5 (2025-06-25): Implement CSP and validation utilities
+- PR #6 (2025-06-25): Add nonce replacement server
+- PR #7 (2025-06-25): Add error boundary component and tests
+- PR #8 (2025-06-25): Update test script to run vitest once
+- PR #9 (2025-06-25): Exclude UI barrel file from coverage
+- PR #10 (2025-06-26): Update ErrorBoundary with branding and logging
+- PR #11 (2025-06-26): Remove old ErrorBoundary path references
+- PR #12 (2025-06-26): Improve ErrorBoundary logging test
+- PR #13 (2025-06-26): Refactor ErrorBoundary fallback
+- PR #14 (2025-06-26): Update docs for ErrorBoundary
+- PR #15 (2025-06-26): Add CSS variables for light and dark themes
+- PR #16 (2025-06-26): Centralize CSP with Helmet
+- PR #17 (2025-06-26): Implement lazy-loaded routing
+- PR #18 (2025-06-26): Add integration test suite
+- PR #19 (2025-06-26): Implement consistent import ordering
+- PR #20 (2025-06-26): Fix missing core utilities and UI component
+- PR #21 (2025-06-26): Optimize LoadingSpinner and cleanup ErrorBoundary
+- PR #22 (2025-06-26): Fix ErrorBoundary imports
+- PR #23 (2025-06-26): Add comprehensive component tests
+- PR #28 (2025-06-27): Fix lazy preload type
+- PR #29 (2025-06-27): Add SEO meta tags
+- PR #30 (2025-06-27): Add article cards and page
+- PR #31 (2025-06-27): Add contact and search navigation
+- PR #32 (2025-06-27): Add tests for Articles page
+- PR #33 (2025-06-27): Add mobile drawer navigation
+- PR #34 (2025-06-27): Add core UI components
+- PR #35 (2025-06-27): Add optional bundle analysis and compression
+- PR #36 (2025-06-27): Add Plausible analytics integration
+- PR #37 (2025-06-28): Enhance AI news site landing pages with new hero design
+- PR #38 (2025-06-28): Add article-related schemas
+- PR #39 (2025-06-28): Add useArticles hook with validation
+- PR #40 (2025-06-28): Add API article fetching
+- PR #41 (2025-06-28): Move ArticleCard component
+- PR #42 (2025-06-28): Add responsive ArticleGrid component
+- PR #43 (2025-06-28): Add article hook and component tests
+- PR #44 (2025-06-28): Add API base URL env setting
+- PR #45 (2025-06-28): Improve CSP and security headers
+- PR #46 (2025-06-28): Fix mobile menu close on navigation
+- PR #47 (2025-06-28): Improve header navigation with React Router
+- PR #48 (2025-06-28): Improve drawer focus handling
+- PR #49 (2025-06-28): Update articles author structure
+- PR #50 (2025-06-28): Fix focus management and remove build artifact
+- PR #51 (2025-06-28): Fix mobile menu and focus
+- PR #52 (2025-06-28): Add react-helmet support
+- PR #53 (2025-06-28): Add skeleton loading component
+- PR #54 (2025-06-28): Update CORS config
+- PR #55 (2025-06-28): Add structured logger and tests
+- PR #56 (2025-06-28): Implement logger usage in ErrorBoundary
