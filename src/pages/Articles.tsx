@@ -1,7 +1,7 @@
 import React from 'react'
 
-import ArticleCard from '@/components/features/ArticleCard'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import ArticleCard from '@/components/ui/ArticleCard'
 
 import { useArticles } from '@/hooks/useArticles'
 

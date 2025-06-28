@@ -19,6 +19,7 @@ export interface Article {
   excerpt: string
   author: Author
   image: string
+  imageAlt?: string
 }
 
 export const ArticleSchema = z.object({
@@ -26,7 +27,8 @@ export const ArticleSchema = z.object({
   title: z.string().min(1),
   excerpt: z.string().min(1),
   author: AuthorSchema,
-  image: z.string().url()
+  image: z.string().url(),
+  imageAlt: z.string().optional()
 })
 export type ArticleFromSchema = z.infer<typeof ArticleSchema>
 

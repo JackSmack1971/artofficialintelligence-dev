@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
-import ArticleCard from '@/components/features/ArticleCard'
 import NeuralBackground from '@/components/features/NeuralBackground'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import ArticleCard from '@/components/ui/ArticleCard'
 
 import { fetchWithRetry } from '@/lib/api'
 import type { Article } from '@/types/article'
