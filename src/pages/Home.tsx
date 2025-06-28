@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import ArticleCard from '@/components/features/ArticleCard'
+import NeuralBackground from '@/components/features/NeuralBackground'
 import LoadingSpinner from '@/components/LoadingSpinner'
 
 import { fetchWithRetry } from '@/lib/api'
@@ -33,18 +34,28 @@ const Home: React.FC = () => {
   return (
     <main>
       <section
-        className="py-16 text-center bg-ai-primary text-white"
+        className="relative overflow-hidden py-24 text-center bg-ai-primary text-white"
         data-testid="hero"
       >
-        <h1 className="text-3xl font-bold">ArtOfficial Intelligence</h1>
-        <p className="text-lg">Latest news in artificial intelligence</p>
+        <NeuralBackground className="absolute inset-0 w-full h-full opacity-40" />
+        <div className="relative z-10 max-w-4xl mx-auto px-4">
+          <h1 className="mb-4 text-4xl font-bold md:text-6xl">
+            ArtOfficial Intelligence
+          </h1>
+          <p className="text-lg md:text-xl text-ai-surface">
+            Latest news in artificial intelligence
+          </p>
+        </div>
       </section>
-      <section className="p-4">
+      <section className="p-4 max-w-6xl mx-auto">
         {status && <p data-testid="status">Status: {status}</p>}
         {loading ? (
           <LoadingSpinner />
         ) : (
-          <ul className="grid gap-4 md:grid-cols-3" data-testid="articles">
+          <ul
+            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr"
+            data-testid="articles"
+          >
             {articles.slice(0, 3).map((article) => (
               <li key={article.id}>
                 <ArticleCard {...article} />
