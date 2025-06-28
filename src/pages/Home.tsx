@@ -58,7 +58,7 @@ const Home: React.FC = () => {
           >
             {articles.slice(0, 3).map((article) => (
               <li key={article.id}>
-                <ArticleCard {...article} />
+                <ArticleCard {...article} author={article.author.name} />
               </li>
             ))}
           </ul>
