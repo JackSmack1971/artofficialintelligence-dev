@@ -11,3 +11,4 @@ export {
 } from './Card'
 export { Modal } from './Modal'
 export { ArticleCard } from './ArticleCard'
+export { default as Skeleton } from './Skeleton'
