@@ -5,8 +5,8 @@ import path from 'path'
 import request from 'supertest'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createServer, startServer } from '../src/server'
 import { logger } from '../src/lib/logger'
+import { createServer, startServer } from '../src/server'
 
 let tmpDir: string
 
@@ -53,9 +53,10 @@ describe('server nonce', () => {
     await new Promise((resolve) => server.close(resolve))
   })
 
-  it('logs server start', () => {
+  it('logs server start', async () => {
     const spy = vi.spyOn(logger, 'info').mockImplementation(() => {})
     const server = startServer(0)
+    await new Promise((r) => setTimeout(r, 20))
     expect(spy).toHaveBeenCalledWith(expect.stringContaining('Server running'))
     server.close()
     spy.mockRestore()
@@ -114,6 +115,12 @@ describe('server nonce', () => {
     const res = await request(app).get('/')
     expect(res.headers['x-frame-options']).toBe('DENY')
     expect(res.headers['x-content-type-options']).toBe('nosniff')
+    expect(res.headers['referrer-policy']).toBe('no-referrer')
+    expect(res.headers['x-permitted-cross-domain-policies']).toBe('none')
+    expect(res.headers['cross-origin-opener-policy']).toBe('same-origin')
+    expect(res.headers['permissions-policy']).toBe(
+      'geolocation=(), microphone=()'
+    )
   })
 
   it('throws if CORS_ORIGIN is missing', () => {
