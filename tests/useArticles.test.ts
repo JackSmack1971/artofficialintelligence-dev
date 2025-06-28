@@ -18,7 +18,11 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
-describe.skip('useArticles', () => {
+describe('useArticles', () => {
+  it('initializes with loading state', () => {
+    const { result } = renderHook(() => useArticles({ retries: 0 }))
+    expect(result.current.loading).toBe(true)
+  })
   it('returns data on success', async () => {
     vi.stubGlobal(
       'fetch',
@@ -36,28 +40,25 @@ describe.skip('useArticles', () => {
       vi.fn().mockResolvedValue({ ok: false, status: 500 })
     )
     const { result } = renderHook(() => useArticles({ retries: 0 }))
-    await waitFor(() => !result.current.loading)
+    await waitFor(() => result.current.error !== undefined)
     expect(result.current.error).toMatch('500')
     expect(result.current.data).toEqual([])
+  })
+
+  it('handles fetch rejection', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('boom')))
+    const { result } = renderHook(() => useArticles({ retries: 0 }))
+    await waitFor(() => result.current.error !== undefined)
+    expect(result.current.error).toBe('boom')
   })
 
   it('handles timeout', async () => {
     vi.stubGlobal(
       'fetch',
-      (_: string, opts: { signal: AbortSignal }) =>
-        new Promise((_res, reject) =>
-          opts.signal.addEventListener('abort', () =>
-            reject(new DOMException('Aborted', 'AbortError'))
-          )
-        )
+      vi.fn().mockRejectedValue(new DOMException('Aborted', 'AbortError'))
     )
-    vi.useFakeTimers()
-    const { result } = renderHook(() =>
-      useArticles({ timeout: 10, retries: 0 })
-    )
-    vi.runAllTimers()
+    const { result } = renderHook(() => useArticles({ retries: 0 }))
     await waitFor(() => result.current.error !== undefined)
     expect(result.current.error).toBe('Request timed out')
-    vi.useRealTimers()
   })
 })

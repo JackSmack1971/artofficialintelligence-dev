@@ -7,7 +7,7 @@ import { vi } from 'vitest'
 import ArticleCard from '@/components/ui/ArticleCard'
 
 describe('ArticleCard', () => {
-  it('renders article information with alt text', () => {
+  it('renders provided article information', () => {
     render(
       <ArticleCard
         title="Test Title"
@@ -19,6 +19,21 @@ describe('ArticleCard', () => {
     )
     expect(screen.getByText('Test Title')).toBeInTheDocument()
     expect(screen.getByAltText('Alt text')).toBeInTheDocument()
+    expect(screen.getByTestId('article-card')).toBeInTheDocument()
+  })
+
+  it('uses default alt text when none provided', () => {
+    render(
+      <ArticleCard
+        title="Default Alt"
+        excerpt="Test"
+        author="Tester"
+        image="test.jpg"
+      />
+    )
+    expect(
+      screen.getByAltText('Illustration for Default Alt')
+    ).toBeInTheDocument()
   })
 
   it('handles click events', async () => {

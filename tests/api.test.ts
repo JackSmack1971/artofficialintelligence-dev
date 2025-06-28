@@ -67,13 +67,29 @@ describe('getArticles', () => {
     vi.stubGlobal('fetch', fetchMock)
     const res = await getArticles()
     expect(res.length).toBe(1)
-    expect(fetchMock).toHaveBeenCalledWith('https://api/articles', expect.anything())
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://api/articles',
+      expect.anything()
+    )
   })
 
   it('throws ApiError on api error', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({ ok: true, json: async () => ({ success: false, error: 'bad' }) })
+      vi
+        .fn()
+        .mockResolvedValue({
+          ok: true,
+          json: async () => ({ success: false, error: 'bad' })
+        })
+    )
+    await expect(getArticles()).rejects.toBeInstanceOf(ApiError)
+  })
+
+  it('throws ApiError on invalid json', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) })
     )
     await expect(getArticles()).rejects.toBeInstanceOf(ApiError)
   })
