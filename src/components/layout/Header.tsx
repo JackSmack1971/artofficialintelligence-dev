@@ -32,6 +32,18 @@ export const Header: React.FC<HeaderProps> = React.memo(
       setMobileOpen(false)
     }, [location.pathname])
 
+    useEffect(() => {
+      document.body.classList.toggle('overflow-hidden', mobileOpen)
+      const handleResize = () => {
+        if (window.innerWidth >= 768) setMobileOpen(false)
+      }
+      window.addEventListener('resize', handleResize)
+      return () => {
+        document.body.classList.remove('overflow-hidden')
+        window.removeEventListener('resize', handleResize)
+      }
+    }, [mobileOpen])
+
     const toggleMobile = useCallback(() => {
       setMobileOpen((prev) => !prev)
     }, [])
@@ -96,14 +108,16 @@ export const Header: React.FC<HeaderProps> = React.memo(
                 variant="ghost"
                 size="sm"
                 className="md:hidden"
-                aria-label="Open navigation menu"
+                aria-label={
+                  mobileOpen ? 'Close navigation menu' : 'Open navigation menu'
+                }
                 aria-expanded={mobileOpen}
                 aria-controls="mobile-menu"
                 onClick={toggleMobile}
                 onKeyDown={handleToggleKeyDown}
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-6 h-6 transition-transform"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -113,7 +127,11 @@ export const Header: React.FC<HeaderProps> = React.memo(
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
+                    d={
+                      mobileOpen
+                        ? 'M6 18L18 6M6 6l12 12'
+                        : 'M4 6h16M4 12h16M4 18h16'
+                    }
                   />
                 </svg>
               </Button>
