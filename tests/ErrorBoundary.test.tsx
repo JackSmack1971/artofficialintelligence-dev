@@ -5,6 +5,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import ErrorBoundary from '@/components/ErrorBoundary'
+
 import { logger } from '../src/lib/logger'
 
 const ProblemChild = () => {
@@ -70,7 +71,11 @@ describe('ErrorBoundary', () => {
     expect(errArg).toBeInstanceOf(Error)
     expect(errArg.message).toBe('boom')
     expect(context).toEqual(
-      expect.objectContaining({ componentStack: expect.any(String) })
+      expect.objectContaining({
+        componentStack: expect.any(String),
+        route: '/',
+        hasFallback: false
+      })
     )
 
     spy.mockRestore()
