@@ -16,7 +16,11 @@ export default defineConfig({
         'src/server.ts',
         'src/server/**/*.ts'
       ],
-      exclude: ['src/components/ui/index.ts']
+      exclude: ['src/components/ui/index.ts'],
+      lines: 80,
+      functions: 80,
+      branches: 70,
+      statements: 80
     }
   }
 })

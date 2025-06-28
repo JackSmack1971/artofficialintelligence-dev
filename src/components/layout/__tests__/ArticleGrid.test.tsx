@@ -37,4 +37,10 @@ describe('ArticleGrid component', () => {
       'lg:grid-cols-3'
     )
   })
+
+  it('uses default test id and accepts custom class', () => {
+    render(<ArticleGrid articles={articles} className="custom" />)
+    const grid = screen.getByTestId('article-grid')
+    expect(grid).toHaveClass('custom')
+  })
 })
