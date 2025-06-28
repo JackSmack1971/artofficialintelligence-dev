@@ -8,12 +8,44 @@ import rateLimit from 'express-rate-limit'
 
 import { securityMiddleware } from './server/security.js'
 
+class ConfigurationError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ConfigurationError'
+  }
+}
+
+function getAllowedOrigins(): string[] {
+  const raw = process.env.CORS_ORIGIN
+  if (!raw) throw new ConfigurationError('CORS_ORIGIN is not defined')
+  return raw
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean)
+}
+
+function createCorsOptions() {
+  const whitelist = getAllowedOrigins()
+  return {
+    origin(
+      origin: string | undefined,
+      callback: (err: Error | null, ok?: boolean) => void
+    ) {
+      if (!origin || whitelist.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    }
+  }
+}
+
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
   const app = express()
   app.set('trust proxy', 1)
-  app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }))
+  app.use(cors(createCorsOptions()))
 
   const enforceHttps = (req: Request, res: Response, next: NextFunction) => {
     if (process.env.NODE_ENV === 'production' && req.protocol === 'http') {
