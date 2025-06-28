@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { logger } from '../src/lib/logger'
 import { createServer, startServer } from '../src/server'
+import { validateSecurityHeaders } from './utils/security-headers'
 
 let tmpDir: string
 
@@ -113,14 +114,7 @@ describe('server nonce', () => {
     await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
     const app = createServer(tmpDir)
     const res = await request(app).get('/')
-    expect(res.headers['x-frame-options']).toBe('DENY')
-    expect(res.headers['x-content-type-options']).toBe('nosniff')
-    expect(res.headers['referrer-policy']).toBe('no-referrer')
-    expect(res.headers['x-permitted-cross-domain-policies']).toBe('none')
-    expect(res.headers['cross-origin-opener-policy']).toBe('same-origin')
-    expect(res.headers['permissions-policy']).toBe(
-      'geolocation=(), microphone=()'
-    )
+    validateSecurityHeaders(res.headers as Record<string, string>)
   })
 
   it('throws if CORS_ORIGIN is missing', () => {
