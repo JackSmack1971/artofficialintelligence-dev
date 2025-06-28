@@ -2,6 +2,7 @@ import { promises as fs } from 'fs'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 
+import cors from 'cors'
 import express, { NextFunction, Request, Response } from 'express'
 import rateLimit from 'express-rate-limit'
 
@@ -11,11 +12,23 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
   const app = express()
+  app.set('trust proxy', 1)
+  app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }))
 
-  // Rate limiter: maximum of 100 requests per 15 minutes
+  const enforceHttps = (req: Request, res: Response, next: NextFunction) => {
+    if (process.env.NODE_ENV === 'production' && req.protocol === 'http') {
+      return res.redirect(301, `https://${req.headers.host}${req.originalUrl}`)
+    }
+    next()
+  }
+
+  app.use(enforceHttps)
+
   const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false
   })
 
   app.use(securityMiddleware())
@@ -26,12 +39,21 @@ export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
     async (_req: Request, res: Response, next: NextFunction) => {
       try {
         const indexPath = path.join(distDir, 'index.html')
-        let html = await fs.readFile(indexPath, 'utf8')
-        html = html.replace(/__NONCE__/g, res.locals.nonce as string)
-        res.type('html').send(html)
+        const html = await fs.readFile(indexPath, 'utf8')
+        const safeHtml = html.split('__CSP_NONCE__').join(res.locals.nonce)
+        res.type('html').send(safeHtml)
       } catch (error) {
         next(error)
       }
+    }
+  )
+
+  app.post(
+    '/csp-report',
+    express.json({ type: ['json', 'application/csp-report'] }),
+    (_req, res) => {
+      console.warn('CSP Violation', _req.body)
+      res.status(204).end()
     }
   )
 
