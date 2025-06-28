@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { ApiError, fetchWithRetry } from '@/lib/api'
-import { ArticleSchema, type Article, type LoadingState } from '@/types/article'
+import { type Article, ArticleSchema, type LoadingState } from '@/types/article'
 
 interface Options {
   url?: string
@@ -14,7 +14,10 @@ export function useArticles({
   timeout = 5000,
   retries = 3
 }: Options = {}): LoadingState<Article[]> {
-  const [state, setState] = useState<LoadingState<Article[]>>({ data: [], loading: true })
+  const [state, setState] = useState<LoadingState<Article[]>>({
+    data: [],
+    loading: true
+  })
 
   useEffect(() => {
     let cancelled = false
@@ -24,8 +27,12 @@ export function useArticles({
         const data = ArticleSchema.array().parse(await res.json())
         if (!cancelled) setState({ data, loading: false })
       } catch (e) {
-        const err = e instanceof ApiError ? e : new ApiError(e instanceof Error ? e.message : 'Unknown error')
-        if (!cancelled) setState({ data: [], loading: false, error: err.message })
+        const err =
+          e instanceof ApiError
+            ? e
+            : new ApiError(e instanceof Error ? e.message : 'Unknown error')
+        if (!cancelled)
+          setState({ data: [], loading: false, error: err.message })
       }
     }
     void fetchData()
