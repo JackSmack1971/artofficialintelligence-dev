@@ -9,6 +9,7 @@ import {
   waitFor
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { HelmetProvider } from 'react-helmet-async'
 
 interface WrapperProps {
   initialEntries?: string[]
@@ -17,7 +18,11 @@ interface WrapperProps {
 const Providers: FC<PropsWithChildren<WrapperProps>> = ({
   children,
   initialEntries
-}) => <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
+}) => (
+  <HelmetProvider context={{}}>
+    <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
+  </HelmetProvider>
+)
 
 export const customRender = (
   ui: ReactElement,

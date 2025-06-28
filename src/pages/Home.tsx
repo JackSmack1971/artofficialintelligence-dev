@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import NeuralBackground from '@/components/features/NeuralBackground'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import SEOHead from '@/components/SEOHead'
 import ArticleCard from '@/components/ui/ArticleCard'
 
 import { fetchWithRetry } from '@/lib/api'
@@ -33,6 +34,10 @@ const Home: React.FC = () => {
 
   return (
     <main id="main-content" tabIndex={-1}>
+      <SEOHead
+        title="ArtOfficial Intelligence"
+        description="Latest news in artificial intelligence"
+      />
       <section
         className="relative overflow-hidden py-24 text-center bg-ai-primary text-white"
         data-testid="hero"

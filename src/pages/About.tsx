@@ -1,11 +1,17 @@
 import React from 'react'
 
+import SEOHead from '@/components/SEOHead'
+
 const About: React.FC = () => (
   <main
     id="main-content"
     tabIndex={-1}
     className="max-w-4xl mx-auto px-4 py-8 space-y-6"
   >
+    <SEOHead
+      title="About - ArtOfficial Intelligence"
+      description="Learn more about ArtOfficial Intelligence"
+    />
     <header className="text-center">
       <h1 className="text-3xl font-bold text-ai-primary mb-2">
         About ArtOfficial Intelligence
