@@ -1,14 +1,14 @@
 import React from 'react'
 
-import LoadingSpinner from '@/components/LoadingSpinner'
 import ArticleCard from '@/components/ui/ArticleCard'
+import Skeleton from '@/components/ui/Skeleton'
 
 import { useArticles } from '@/hooks/useArticles'
 
 const Articles: React.FC = () => {
   const { data, loading, error } = useArticles()
 
-  if (loading) return <LoadingSpinner />
+  if (loading) return <Skeleton count={6} className="h-48" />
 
   return (
     <main id="main-content" tabIndex={-1} className="p-4">
