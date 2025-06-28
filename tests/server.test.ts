@@ -3,7 +3,7 @@ import os from 'os'
 import path from 'path'
 
 import request from 'supertest'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { createServer, startServer } from '../src/server'
 
@@ -11,6 +11,10 @@ let tmpDir: string
 
 afterEach(async () => {
   if (tmpDir) await fs.rm(tmpDir, { recursive: true, force: true })
+})
+
+beforeEach(() => {
+  process.env.CORS_ORIGIN = 'http://localhost'
 })
 
 describe('server nonce', () => {
@@ -101,5 +105,19 @@ describe('server nonce', () => {
     const res = await request(app).get('/')
     expect(res.headers['x-frame-options']).toBe('DENY')
     expect(res.headers['x-content-type-options']).toBe('nosniff')
+  })
+
+  it('throws if CORS_ORIGIN is missing', () => {
+    delete process.env.CORS_ORIGIN
+    expect(() => createServer()).toThrow('CORS_ORIGIN is not defined')
+  })
+
+  it('rejects requests from invalid origins', async () => {
+    process.env.CORS_ORIGIN = 'http://allowed.com'
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'nonce-test-'))
+    await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
+    const app = createServer(tmpDir)
+    const res = await request(app).get('/').set('Origin', 'http://bad.com')
+    expect(res.status).toBe(500)
   })
 })
