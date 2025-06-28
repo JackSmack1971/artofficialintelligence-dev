@@ -3,10 +3,8 @@ import React from 'react'
 import type { Article } from '@/types/article'
 
 export interface ArticleCardProps
-  extends Pick<
-    Article,
-    'id' | 'title' | 'excerpt' | 'author' | 'image' | 'imageAlt'
-  > {
+  extends Pick<Article, 'id' | 'title' | 'excerpt' | 'image' | 'imageAlt'> {
+  author: string
   onClick?: (id: string) => void
   'data-testid'?: string
 }

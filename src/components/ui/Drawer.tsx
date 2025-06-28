@@ -9,13 +9,15 @@ interface DrawerProps {
   onClose: () => void
   children: React.ReactNode
   toggleRef?: React.RefObject<HTMLElement>
+  ariaLabel?: string
 }
 
 export const Drawer: React.FC<DrawerProps> = ({
   open,
   onClose,
   children,
-  toggleRef
+  toggleRef,
+  ariaLabel
 }) => {
   const ref = useFocusTrap(open, toggleRef, onClose)
 
@@ -32,6 +34,7 @@ export const Drawer: React.FC<DrawerProps> = ({
         ref={ref}
         role="dialog"
         aria-modal="true"
+        aria-label={ariaLabel}
         tabIndex={-1}
         className="relative w-64 max-w-full h-full bg-white dark:bg-gray-900 shadow-xl transform transition-transform duration-300"
       >

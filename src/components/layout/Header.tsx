@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
@@ -17,6 +17,7 @@ export const Header: React.FC<HeaderProps> = React.memo(
   ({ navigation, className = '', 'data-testid': testId = 'header' }) => {
     const location = useLocation()
     const [mobileOpen, setMobileOpen] = useState(false)
+    const toggleRef = useRef<HTMLButtonElement>(null)
 
     const items = useMemo(
       () =>
@@ -91,6 +92,7 @@ export const Header: React.FC<HeaderProps> = React.memo(
                 ))}
               </ul>
               <Button
+                ref={toggleRef}
                 variant="ghost"
                 size="sm"
                 className="md:hidden"
@@ -115,7 +117,12 @@ export const Header: React.FC<HeaderProps> = React.memo(
                   />
                 </svg>
               </Button>
-              <Drawer open={mobileOpen} onClose={() => setMobileOpen(false)}>
+              <Drawer
+                open={mobileOpen}
+                onClose={() => setMobileOpen(false)}
+                toggleRef={toggleRef}
+                ariaLabel="Mobile menu"
+              >
                 <ul id="mobile-menu" role="menu" className="p-4 space-y-2">
                   {items.map(({ href, label, isActive }) => (
                     <li key={href} role="none">

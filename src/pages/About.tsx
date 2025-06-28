@@ -1,7 +1,11 @@
 import React from 'react'
 
 const About: React.FC = () => (
-  <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+  <main
+    id="main-content"
+    tabIndex={-1}
+    className="max-w-4xl mx-auto px-4 py-8 space-y-6"
+  >
     <header className="text-center">
       <h1 className="text-3xl font-bold text-ai-primary mb-2">
         About ArtOfficial Intelligence
