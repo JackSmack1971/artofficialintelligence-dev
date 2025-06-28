@@ -48,4 +48,16 @@ describe('Header component', () => {
     await userEvent.keyboard('{Escape}')
     expect(screen.queryByRole('menu')).not.toBeInTheDocument()
   })
+
+  it('closes menu on navigation', async () => {
+    renderHeader()
+    const button = screen.getByRole('button', { name: /open navigation menu/i })
+    await userEvent.click(button)
+    const menu = screen.getByRole('menu')
+    expect(menu).toBeInTheDocument()
+    await userEvent.click(
+      within(menu).getByRole('menuitem', { name: /about/i })
+    )
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+  })
 })
