@@ -40,6 +40,13 @@ export function securityMiddleware() {
         useDefaults: false,
         directives: createDirectives(res)
       })(req, res, next),
+    helmet.referrerPolicy({ policy: 'no-referrer' }),
+    helmet.permittedCrossDomainPolicies(),
+    helmet.crossOriginOpenerPolicy(),
+    (_req: Request, res: Response, next: NextFunction) => {
+      res.setHeader('Permissions-Policy', 'geolocation=(), microphone=()')
+      next()
+    },
     helmet.frameguard({ action: 'deny' }),
     helmet.noSniff(),
     helmet.hsts({ maxAge: 31536000 })
