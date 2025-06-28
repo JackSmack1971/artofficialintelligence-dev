@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Link, useLocation } from 'react-router-dom'
 
@@ -26,6 +26,10 @@ export const Header: React.FC<HeaderProps> = React.memo(
         })),
       [navigation, location.pathname]
     )
+
+    useEffect(() => {
+      setMobileOpen(false)
+    }, [location.pathname])
 
     const toggleMobile = useCallback(() => {
       setMobileOpen((prev) => !prev)
