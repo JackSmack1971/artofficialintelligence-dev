@@ -6,6 +6,8 @@ import cors from 'cors'
 import express, { NextFunction, Request, Response } from 'express'
 import rateLimit from 'express-rate-limit'
 
+import { logger } from './lib/logger.js'
+
 import { securityMiddleware } from './server/security.js'
 
 class ConfigurationError extends Error {
@@ -97,7 +99,7 @@ export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
 export function startServer(port = Number(process.env.PORT) || 3000) {
   const app = createServer()
   const server = app.listen(port, () => {
-    console.log(`Server running on port ${port}`)
+    logger.info(`Server running on port ${port}`)
   })
   return server
 }

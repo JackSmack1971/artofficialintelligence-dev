@@ -3,9 +3,10 @@ import os from 'os'
 import path from 'path'
 
 import request from 'supertest'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createServer, startServer } from '../src/server'
+import { logger } from '../src/lib/logger'
 
 let tmpDir: string
 
@@ -50,6 +51,14 @@ describe('server nonce', () => {
     const server = startServer(0)
     expect(server).toBeTruthy()
     await new Promise((resolve) => server.close(resolve))
+  })
+
+  it('logs server start', () => {
+    const spy = vi.spyOn(logger, 'info').mockImplementation(() => {})
+    const server = startServer(0)
+    expect(spy).toHaveBeenCalledWith(expect.stringContaining('Server running'))
+    server.close()
+    spy.mockRestore()
   })
 
   it('includes meta tags in served HTML', async () => {
