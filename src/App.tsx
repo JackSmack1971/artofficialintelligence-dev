@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header'
 import LoadingSpinner from '@/components/LoadingSpinner'
 
 import { NAVIGATION } from '@/data/navigation'
+import { useRouteFocus } from '@/hooks/useRouteFocus'
 import { lazyWithPreload } from '@/lib/lazyWithPreload'
 import { validateNavigation } from '@/lib/validation'
 
@@ -32,6 +33,8 @@ const NotFound = lazyWithPreload(() =>
 
 export const App: React.FC = () => {
   const navigation = validateNavigation(NAVIGATION)
+
+  useRouteFocus()
 
   useEffect(() => {
     void Home.preload()
