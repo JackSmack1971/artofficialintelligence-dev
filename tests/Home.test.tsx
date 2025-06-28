@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from './utils/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import Home from '@/pages/Home'
@@ -41,5 +41,14 @@ describe('Home page', () => {
       screen.getByRole('heading', { name: /artofficial intelligence/i })
     ).toBeInTheDocument()
     expect(await screen.findByText('One')).toBeInTheDocument()
+  })
+
+  it('sets page title', async () => {
+    mockFetch()
+    render(<Home />)
+    await screen.findByRole('heading', { name: /artofficial intelligence/i })
+    await waitFor(() =>
+      expect(document.title).toBe('ArtOfficial Intelligence')
+    )
   })
 })

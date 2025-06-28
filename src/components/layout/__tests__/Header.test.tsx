@@ -1,6 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, within, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
@@ -42,11 +42,15 @@ describe('Header component', () => {
     await userEvent.keyboard('{Enter}')
     expect(screen.getByRole('menu')).toBeInTheDocument()
     await userEvent.keyboard('{Escape}')
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    )
     await userEvent.keyboard(' ')
     expect(screen.getByRole('menu')).toBeInTheDocument()
     await userEvent.keyboard('{Escape}')
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    )
   })
 
   it('closes menu on navigation', async () => {
@@ -58,6 +62,8 @@ describe('Header component', () => {
     await userEvent.click(
       within(menu).getByRole('menuitem', { name: /about/i })
     )
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    )
   })
 })

@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from './utils/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import About from '@/pages/About'
@@ -13,5 +13,12 @@ describe('About page', () => {
     expect(
       screen.getByText(/trusted source for ai creativity/i)
     ).toBeInTheDocument()
+  })
+
+  it('sets page title', async () => {
+    render(<About />)
+    await waitFor(() =>
+      expect(document.title).toBe('About - ArtOfficial Intelligence')
+    )
   })
 })
