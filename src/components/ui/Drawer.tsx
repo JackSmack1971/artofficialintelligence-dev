@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { createPortal } from 'react-dom'
 
@@ -20,8 +20,17 @@ export const Drawer: React.FC<DrawerProps> = ({
   ariaLabel
 }) => {
   const ref = useFocusTrap(open, toggleRef, onClose)
+  const [visible, setVisible] = useState(open)
 
-  if (!open) return null
+  useEffect(() => {
+    if (open) setVisible(true)
+  }, [open])
+
+  const handleTransitionEnd = () => {
+    if (!open) setVisible(false)
+  }
+
+  if (!visible) return null
   return createPortal(
     <div className="fixed inset-0 z-50 flex">
       <div
@@ -36,7 +45,8 @@ export const Drawer: React.FC<DrawerProps> = ({
         aria-modal="true"
         aria-label={ariaLabel}
         tabIndex={-1}
-        className="relative w-64 max-w-full h-full bg-white dark:bg-gray-900 shadow-xl transform transition-transform duration-300"
+        onTransitionEnd={handleTransitionEnd}
+        className={`relative w-64 max-w-full h-full bg-white dark:bg-gray-900 shadow-xl transform transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-full'}`}
       >
         {children}
       </div>
