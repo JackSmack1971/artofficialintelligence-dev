@@ -1,39 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
 import ArticleCard from '@/components/features/ArticleCard'
 import LoadingSpinner from '@/components/LoadingSpinner'
 
-import { fetchWithRetry } from '@/lib/api'
-import type { Article } from '@/types/article'
+import { useArticles } from '@/hooks/useArticles'
 
 const Articles: React.FC = () => {
-  const [articles, setArticles] = useState<Article[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetchWithRetry('/articles.json')
-        setArticles((await res.json()) as Article[])
-      } catch {
-        setArticles([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    void load()
-  }, [])
+  const { data, loading, error } = useArticles()
 
   if (loading) return <LoadingSpinner />
 
   return (
     <section className="p-4">
       <h2 className="text-xl font-semibold mb-4">Articles</h2>
+      {error && <p className="text-red-500">{error}</p>}
       <ul className="grid gap-4 md:grid-cols-2">
-        {articles.map((article) => (
+        {data.map((article) => (
           <li key={article.id}>
-            <ArticleCard {...article} />
+            <ArticleCard
+              {...article}
+              author={
+                typeof article.author === 'string'
+                  ? article.author
+                  : article.author.name
+              }
+            />
           </li>
         ))}
       </ul>
