@@ -11,13 +11,14 @@ const mockFetch = () => {
   vi.stubGlobal(
     'fetch',
     vi.fn((url: string) => {
-      if (url === '/api/health') {
+      const base = process.env.VITE_API_URL
+      if (url === `${base}/api/health`) {
         return Promise.resolve({
           ok: true,
           json: async () => ({ status: 'ok' })
         })
       }
-      if (url === '/articles.json') {
+      if (url === `${base}/articles.json`) {
         return Promise.resolve({ ok: true, json: async () => [] })
       }
       return Promise.resolve({ ok: true, json: async () => ({}) })

@@ -8,3 +8,5 @@ expect.extend(toHaveNoViolations)
 afterEach(() => {
   cleanup()
 })
+
+process.env.VITE_API_URL = 'http://localhost'

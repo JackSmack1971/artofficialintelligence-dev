@@ -1,4 +1,3 @@
-
 import { ApiResponseSchema, type Article, ArticleSchema } from '@/types/article'
 
 export class ApiError extends Error {
@@ -17,25 +16,24 @@ interface FetchOptions extends RequestInit {
 }
 
 export async function fetchWithRetry(
-  url: string,
+  path: string,
   { timeout = 5000, retries = 3, ...options }: FetchOptions = {}
 ): Promise<Response> {
+  const base = import.meta.env?.VITE_API_URL ?? process.env.VITE_API_URL
+  const url = new URL(path, base).toString()
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     const controller = new AbortController()
     const id = setTimeout(() => controller.abort(), timeout)
     try {
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal
-      })
+      const res = await fetch(url, { ...options, signal: controller.signal })
       clearTimeout(id)
-      if (!response.ok) {
+      if (!res.ok) {
         throw new ApiError(
-          `Request failed with status ${response.status}`,
-          response.status
+          `Request failed with status ${res.status}`,
+          res.status
         )
       }
-      return response
+      return res
     } catch (error) {
       clearTimeout(id)
       if (attempt === retries) {
@@ -59,10 +57,8 @@ export async function getArticles({
   timeout = 5000,
   retries = 3
 }: ArticleOptions = {}): Promise<Article[]> {
-  const base = import.meta.env?.VITE_API_URL ?? process.env.VITE_API_URL
-  const url = `${base}/articles`
   try {
-    const res = await fetchWithRetry(url, { timeout, retries })
+    const res = await fetchWithRetry('/articles', { timeout, retries })
     const schema = ApiResponseSchema(ArticleSchema.array())
     const parsed = schema.parse(await res.json())
     if (!parsed.success || !parsed.data) {
