@@ -10,6 +10,27 @@
   --ai-warning: 17 88% 40%;
   --ai-surface: 210 40% 96%;
   --ai-background: 210 40% 98%;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.neural-node {
+  @apply absolute w-2 h-2 rounded-full bg-ai-accent opacity-70;
+  animation: float 4s ease-in-out infinite;
 }
 
 [data-theme="dark"],
