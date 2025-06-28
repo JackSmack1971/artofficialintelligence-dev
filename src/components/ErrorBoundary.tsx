@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import type { ErrorInfo, ReactNode } from 'react'
 
 import { Button } from '@/components/ui/Button'
+import { logger } from '@/lib/logger'
 
 // NOTE: use this component via `@/components/ErrorBoundary`
 // Legacy path '@/components/layout/ErrorBoundary' has been removed.
@@ -33,9 +34,7 @@ export class ErrorBoundary extends Component<
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ errorInfo })
-    console.error('ErrorBoundary caught', {
-      timestamp: new Date().toISOString(),
-      message: error.message,
+    logger.error('ErrorBoundary caught', error, {
       componentStack: errorInfo.componentStack
     })
     this.props.onError?.(error, errorInfo)
