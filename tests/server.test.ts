@@ -14,11 +14,11 @@ afterEach(async () => {
 })
 
 describe('server nonce', () => {
-  it('replaces __NONCE__ and sets CSP', async () => {
+  it('replaces __CSP_NONCE__ and sets CSP', async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'nonce-test-'))
     await fs.writeFile(
       path.join(tmpDir, 'index.html'),
-      '<!DOCTYPE html><script nonce="__NONCE__"></script>'
+      '<!DOCTYPE html><script nonce="__CSP_NONCE__"></script>'
     )
     const app = createServer(tmpDir)
     const res = await request(app).get('/')
@@ -81,5 +81,25 @@ describe('server nonce', () => {
     expect(res.text).toContain('data-domain="%VITE_PLAUSIBLE_DOMAIN%"')
     expect(res.text).toContain('src="https://plausible.io/js/script.js"')
     expect(res.text).toContain(`nonce="${nonce}"`)
+  })
+
+  it('accepts CSP violation reports', async () => {
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'nonce-test-'))
+    await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
+    const app = createServer(tmpDir)
+    const res = await request(app)
+      .post('/csp-report')
+      .set('Content-Type', 'application/csp-report')
+      .send('{}')
+    expect(res.status).toBe(204)
+  })
+
+  it('sets security headers', async () => {
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'nonce-test-'))
+    await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
+    const app = createServer(tmpDir)
+    const res = await request(app).get('/')
+    expect(res.headers['x-frame-options']).toBe('DENY')
+    expect(res.headers['x-content-type-options']).toBe('nosniff')
   })
 })
