@@ -43,6 +43,22 @@ describe('App integration', () => {
     ).toBeInTheDocument()
   })
 
+  it('navigates with keyboard without page reload', async () => {
+    mockFetch()
+    render(
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    )
+    await screen.findByRole('heading', { name: /artofficial intelligence/i })
+    const link = screen.getByRole('menuitem', { name: /about/i })
+    link.focus()
+    await userEvent.keyboard(' ')
+    expect(
+      await screen.findByText(/about artofficial intelligence/i)
+    ).toBeInTheDocument()
+  })
+
   it('shows not found on unknown route', async () => {
     mockFetch()
     render(<App />, { initialEntries: ['/missing'] })

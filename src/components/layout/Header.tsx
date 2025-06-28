@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/Button'
 import { Drawer } from '@/components/ui/Drawer'
@@ -45,14 +45,17 @@ export const Header: React.FC<HeaderProps> = React.memo(
       [toggleMobile]
     )
 
+    const navigate = useNavigate()
+
     const handleKeyDown = useCallback(
       (event: React.KeyboardEvent, href: string) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
-          window.location.assign(href)
+          setMobileOpen(false)
+          navigate(href)
         }
       },
-      []
+      [navigate]
     )
 
     return (
