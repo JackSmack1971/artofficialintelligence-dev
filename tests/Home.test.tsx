@@ -5,7 +5,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import Home from '@/pages/Home'
 
 const mockArticles = [
-  { id: '1', title: 'One', excerpt: 'Ex', author: 'A', image: 'img' }
+  {
+    id: '1',
+    title: 'One',
+    excerpt: 'Ex',
+    author: { id: 'a1', name: 'A', avatar: 'a.png' },
+    image: 'img'
+  }
 ]
 
 const mockFetch = () => {

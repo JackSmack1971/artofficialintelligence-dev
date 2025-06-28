@@ -3,21 +3,21 @@
     "id": "1",
     "title": "AI Breakthrough",
     "excerpt": "A new AI model surpasses expectations.",
-    "author": "Jane Doe",
+    "author": { "id": "a1", "name": "Jane Doe", "avatar": "https://via.placeholder.com/40" },
     "image": "https://via.placeholder.com/400x200"
   },
   {
     "id": "2",
     "title": "Machine Learning Trends",
     "excerpt": "Exploring upcoming trends in ML.",
-    "author": "John Smith",
+    "author": { "id": "a2", "name": "John Smith", "avatar": "https://via.placeholder.com/40" },
     "image": "https://via.placeholder.com/400x200"
   },
   {
     "id": "3",
     "title": "Robotics Advances",
     "excerpt": "How robots are transforming industries.",
-    "author": "Alex Johnson",
+    "author": { "id": "a3", "name": "Alex Johnson", "avatar": "https://via.placeholder.com/40" },
     "image": "https://via.placeholder.com/400x200"
   }
 ]

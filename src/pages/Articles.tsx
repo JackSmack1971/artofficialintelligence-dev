@@ -17,14 +17,7 @@ const Articles: React.FC = () => {
       <ul className="grid gap-4 md:grid-cols-2">
         {data.map((article) => (
           <li key={article.id}>
-            <ArticleCard
-              {...article}
-              author={
-                typeof article.author === 'string'
-                  ? article.author
-                  : article.author.name
-              }
-            />
+            <ArticleCard {...article} author={article.author.name} />
           </li>
         ))}
       </ul>
