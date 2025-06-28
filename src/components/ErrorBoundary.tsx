@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import type { ErrorInfo, ReactNode } from 'react'
 
 import { Button } from '@/components/ui/Button'
+
 import { logger } from '@/lib/logger'
 
 // NOTE: use this component via `@/components/ErrorBoundary`
@@ -35,7 +36,9 @@ export class ErrorBoundary extends Component<
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ errorInfo })
     logger.error('ErrorBoundary caught', error, {
-      componentStack: errorInfo.componentStack
+      componentStack: errorInfo.componentStack,
+      route: window.location.pathname,
+      hasFallback: Boolean(this.props.fallback)
     })
     this.props.onError?.(error, errorInfo)
   }
