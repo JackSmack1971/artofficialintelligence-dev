@@ -10,3 +10,4 @@ export {
   CardFooter
 } from './Card'
 export { Modal } from './Modal'
+export { ArticleCard } from './ArticleCard'
