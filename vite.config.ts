@@ -23,11 +23,13 @@ export function createDevHeaders(nonce: string) {
   return {
     'Content-Security-Policy': [
       "default-src 'self'",
-      `script-src 'self' https://cdn.jsdelivr.net 'nonce-${nonce}'`,
+      `script-src 'self' 'nonce-${nonce}'`,
+      `script-src-elem 'self' https://cdn.jsdelivr.net https://plausible.io 'nonce-${nonce}'`,
       `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https:",
-      "connect-src 'self' https://api.artofficial-intelligence.com ws:"
+      "connect-src 'self' https://api.artofficial-intelligence.com ws:",
+      "require-sri-for script style"
     ].join('; '),
     'X-Frame-Options': 'DENY',
     'X-Content-Type-Options': 'nosniff',

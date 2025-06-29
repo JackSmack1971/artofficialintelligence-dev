@@ -3,10 +3,12 @@ import { webcrypto } from 'crypto'
 export interface CspDirectives {
   defaultSrc: string[]
   scriptSrc: string[]
+  scriptSrcElem?: string[]
   styleSrc: string[]
   fontSrc: string[]
   imgSrc: string[]
   connectSrc: string[]
+  requireSriFor?: ("script" | "style")[]
 }
 
 export function generateNonce(): string {
@@ -18,11 +20,18 @@ export function generateNonce(): string {
 export function createCspDirectives(nonce: string): CspDirectives {
   return {
     defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", 'https://cdn.jsdelivr.net', `'nonce-${nonce}'`],
+    scriptSrc: ["'self'", `'nonce-${nonce}'`],
+    scriptSrcElem: [
+      "'self'",
+      'https://cdn.jsdelivr.net',
+      'https://plausible.io',
+      `'nonce-${nonce}'`
+    ],
     styleSrc: ["'self'", `'nonce-${nonce}'`, 'https://fonts.googleapis.com'],
     fontSrc: ["'self'", 'https://fonts.gstatic.com'],
     imgSrc: ["'self'", 'data:', 'https:'],
-    connectSrc: ["'self'", 'https://api.artofficial-intelligence.com', 'ws:']
+    connectSrc: ["'self'", 'https://api.artofficial-intelligence.com', 'ws:'],
+    requireSriFor: ['script', 'style']
   } as const
 }
 
