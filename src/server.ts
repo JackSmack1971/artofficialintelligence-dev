@@ -73,14 +73,17 @@ export async function createServer(distDir = path.join(__dirname, '..', 'dist'))
     }
   )
 
-  app.post(
-    '/csp-report',
-    express.json({ type: ['json', 'application/csp-report'] }),
-    (_req, res) => {
-      console.warn('CSP Violation', _req.body)
-      res.status(204).end()
-    }
-  )
+  const reportEndpoint = env.CSP_REPORT_URI || '/csp-report'
+  if (reportEndpoint.startsWith('/')) {
+    app.post(
+      reportEndpoint,
+      express.json({ type: ['json', 'application/csp-report'] }),
+      (_req, res) => {
+        console.warn('CSP Violation', _req.body)
+        res.status(204).end()
+      }
+    )
+  }
 
   app.use(express.static(distDir))
 

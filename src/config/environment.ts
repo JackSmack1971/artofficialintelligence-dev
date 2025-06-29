@@ -21,7 +21,8 @@ const baseSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   REDIS_URL: redisUrlSchema,
   CORS_ORIGIN: corsOriginSchema,
-  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters')
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+  CSP_REPORT_URI: z.string().url().optional()
 })
 
 export type Env = z.infer<typeof baseSchema>

@@ -19,6 +19,7 @@ beforeEach(() => {
   process.env.CORS_ORIGIN = 'http://localhost'
   process.env.REDIS_URL = 'redis://localhost:6379'
   process.env.JWT_SECRET = 'a'.repeat(32)
+  process.env.CSP_REPORT_URI = 'https://csp.example.com/report'
 })
 
 describe('server nonce', () => {
@@ -38,11 +39,9 @@ describe('server nonce', () => {
     const nonce = nonceMatch![1]
     expect(res.text).toContain(`nonce="${nonce}"`)
     expect(csp).toContain("default-src 'self'")
-    expect(csp).toContain('https://cdn.jsdelivr.net')
-    expect(csp).toContain('https://plausible.io')
-    expect(csp).toContain('https://fonts.googleapis.com')
-    expect(csp).toContain('https://fonts.gstatic.com')
-    expect(csp).toContain('https://api.artofficial-intelligence.com')
+    expect(csp).toContain("object-src 'none'")
+    expect(csp).not.toContain('unsafe-inline')
+    expect(csp).toContain('report-uri https://csp.example.com/report')
   })
 
   it('returns 500 when index load fails', async () => {
@@ -107,6 +106,7 @@ describe('server nonce', () => {
   })
 
   it('accepts CSP violation reports', async () => {
+    process.env.CSP_REPORT_URI = '/csp-report'
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'nonce-test-'))
     await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
     const app = await createServer(tmpDir)

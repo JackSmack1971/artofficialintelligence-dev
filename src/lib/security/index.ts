@@ -1,38 +1,48 @@
-import { webcrypto } from 'crypto'
+import { randomBytes } from 'crypto'
 
 export interface CspDirectives {
   defaultSrc: string[]
   scriptSrc: string[]
-  scriptSrcElem?: string[]
   styleSrc: string[]
   fontSrc: string[]
   imgSrc: string[]
   connectSrc: string[]
-  requireSriFor?: ("script" | "style")[]
+  objectSrc: string[]
+  baseUri: string[]
+  formAction: string[]
+  reportUri?: string[]
 }
 
 export function generateNonce(): string {
-  const arr = new Uint8Array(16)
-  webcrypto.getRandomValues(arr)
-  return Buffer.from(arr).toString('base64')
+  return randomBytes(16).toString('base64')
 }
 
-export function createCspDirectives(nonce: string): CspDirectives {
-  return {
+export interface CreateCspOptions {
+  env?: 'development' | 'production' | 'test'
+  reportUri?: string
+}
+
+export function createCspDirectives(
+  nonce: string,
+  opts: CreateCspOptions = {}
+): CspDirectives {
+  const env = opts.env ?? process.env.NODE_ENV ?? 'production'
+  const directives: CspDirectives = {
     defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", `'nonce-${nonce}'`],
-    scriptSrcElem: [
-      "'self'",
-      'https://cdn.jsdelivr.net',
-      'https://plausible.io',
-      `'nonce-${nonce}'`
-    ],
+    scriptSrc: ["'self'", `'nonce-${nonce}'`, 'https://cdn.jsdelivr.net', 'https://plausible.io'],
     styleSrc: ["'self'", `'nonce-${nonce}'`, 'https://fonts.googleapis.com'],
     fontSrc: ["'self'", 'https://fonts.gstatic.com'],
     imgSrc: ["'self'", 'data:', 'https:'],
-    connectSrc: ["'self'", 'https://api.artofficial-intelligence.com', 'ws:'],
-    requireSriFor: ['script', 'style']
-  } as const
+    connectSrc: ["'self'", 'https://api.artofficial-intelligence.com'],
+    objectSrc: ["'none'"],
+    baseUri: ["'self'"],
+    formAction: ["'self'"]
+  }
+
+  if (env !== 'production') directives.connectSrc.push('ws:')
+  if (opts.reportUri) directives.reportUri = [opts.reportUri]
+
+  return directives
 }
 
 export interface SecurityHeaders {

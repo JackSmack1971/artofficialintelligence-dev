@@ -12,7 +12,8 @@ describe('environment validation', () => {
     PORT: '3000',
     CORS_ORIGIN: 'http://localhost:3000',
     REDIS_URL: 'redis://localhost:6379',
-    JWT_SECRET: 'a'.repeat(32)
+    JWT_SECRET: 'a'.repeat(32),
+    CSP_REPORT_URI: 'https://csp.example.com/report'
   }
 
   it('throws when required variable missing', () => {
@@ -39,5 +40,6 @@ describe('environment validation', () => {
     const env = validateEnv()
     expect(env.PORT).toBe(3000)
     expect(env.CORS_ORIGIN).toEqual(['http://localhost:3000'])
+    expect(env.CSP_REPORT_URI).toBe('https://csp.example.com/report')
   })
 })
