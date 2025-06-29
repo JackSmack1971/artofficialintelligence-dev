@@ -141,7 +141,9 @@ const componentVariants = {
 ### React 18 Concurrent Features
 ```typescript
 // Lazy loading with Suspense for code splitting
-const FeatureComponent = lazy(() => import('./FeatureComponent'));
+import { lazy, Suspense, useTransition, useState } from 'react';
+
+const FeatureComponent = lazy(() => import('./FeatureComponent')); // Assume this is a slow component
 
 const ComponentWithSuspense: React.FC = () => {
   return (
@@ -151,19 +153,36 @@ const ComponentWithSuspense: React.FC = () => {
   );
 };
 
-// StartTransition for non-urgent updates
+// useTransition for non-urgent updates
+const SlowContent = ({ count }: { count: number }) => {
+  const items = [];
+  for (let i = 0; i < count; i++) {
+    items.push(<div key={i}>Item {i}</div>);
+    // Simulate a slow render
+    let startTime = performance.now();
+    while (performance.now() - startTime < 0.1) {}
+  }
+  return <div>{items}</div>;
+};
+
 const ComponentWithTransition: React.FC = () => {
+  const [inputValue, setInputValue] = useState('');
+  const [displayValue, setDisplayValue] = useState('');
   const [isPending, startTransition] = useTransition();
-  
-  const handleUpdate = (newData: Data) => {
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
     startTransition(() => {
-      setData(newData);
+      // This update is marked as a transition and can be interrupted
+      setDisplayValue(e.target.value);
     });
   };
   
   return (
-    <div className={isPending ? 'opacity-50 transition-opacity' : ''}>
-      {/* Component content */}
+    <div>
+      <input type="text" value={inputValue} onChange={handleChange} />
+      {isPending && <div className="text-gray-500">Loading...</div>}
+      <SlowContent count={displayValue.length * 100} />
     </div>
   );
 };
