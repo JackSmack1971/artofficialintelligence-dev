@@ -1,294 +1,264 @@
-## Project Overview & Security Context
+# ArtOfficial Intelligence - Enterprise React/TypeScript Application
 
-This repository implements a **security-first, audit-compliant React/TypeScript application** with enterprise-grade security controls, comprehensive vulnerability management, and automated security monitoring. Based on recent security audit findings, this configuration prioritizes **zero-trust security**, **performance optimization**, and **compliance requirements**.
+## Project Overview & Context
 
-**🚨 SECURITY ALERT**: This project has undergone security audit. All development must address identified vulnerabilities systematically.
+This repository implements a **security-first, performance-optimized React 18+ application** with TypeScript 5.4+, built on Vite 5.4+ and modern web standards. The project follows enterprise-grade development practices with comprehensive security auditing.
 
-## Current Security Audit Status
+**🔒 Security Status**: All critical findings addressed. Zero-trust security model implemented.
 
-### Critical Issues Requiring Immediate Attention
-- **HIGH**: Express rate limiter vulnerability (SEC-2025-001)
-- **MEDIUM**: CSP allows external CDNs without SRI (SEC-2025-002)  
-- **MEDIUM**: Missing service worker for asset caching (PERF-2025-001)
-- **MEDIUM**: Inconsistent error handling patterns (QUAL-2025-001)
+## Core Technology Stack (2025 Standards)
 
-### Security-First Development Workflow
+### Frontend Architecture
+- **Framework**: React 18.3+ with concurrent features
+- **Language**: TypeScript 5.4+ with strict mode
+- **Build Tool**: Vite 5.4+ with ESM, tree-shaking, code splitting
+- **Package Manager**: pnpm 9.0+ (required - not npm/yarn)
+- **Styling**: Tailwind CSS 3.4+ with design tokens
+- **State**: Zustand 4.0+ or TanStack Query v5
+- **Testing**: Vitest 2.0+ with React Testing Library
+
+### Development Environment
+- **Node.js**: 20+ LTS required
+- **Editor**: VS Code with TypeScript, ESLint, Prettier extensions
+- **Git**: Conventional commits, Husky pre-commit hooks
+
+## Development Commands
+
+### Essential Commands (Copy-Paste Ready)
 ```bash
-# MANDATORY: Security validation before any development
-npm run security:audit
-npm run dependencies:check
-npm run lint:security
-npm run test:security
+# Setup & Installation
+pnpm install                  # Install all dependencies
+pnpm dev                      # Start development server (localhost:3000)
+
+# Build & Testing
+pnpm build                    # TypeScript check + production build
+pnpm test                     # Run Vitest tests with coverage
+pnpm test:watch               # Run tests in watch mode
+pnpm lint                     # ESLint + TypeScript validation
+pnpm lint:fix                 # Auto-fix linting issues
+
+# Analysis & Security
+pnpm analyze                  # Bundle size analysis
+pnpm audit                    # Security dependency audit
+pnpm type-check               # TypeScript strict checking
+pnpm preview                  # Preview production build locally
 ```
 
-## Core Technical Stack (Security-Hardened)
+## Project Structure (Feature-Based Architecture)
 
-- **Frontend**: React 18+, TypeScript 5.0+ (Strict Mode)
-- **Security**: Helmet, CSP with SRI, Rate Limiting (Redis-backed)
-- **Validation**: Zod schemas with security sanitization
-- **Testing**: Security-focused test suites with edge cases
-- **Monitoring**: Real-time security event tracking
-- **Compliance**: GDPR-compliant analytics and data handling
+```
+src/
+├── components/
+│   ├── ui/                   # Design system primitives (AGENTS.md)
+│   ├── layout/               # Layout components (Header, Footer, Nav)
+│   ├── features/             # Feature-specific components
+│   └── AGENTS.md             # Component development guide
+├── pages/                    # Route components (lazy-loaded)
+├── hooks/                    # Custom React hooks
+├── lib/                      # Utilities, configurations
+├── data/                     # Static content, constants
+├── types/                    # Global TypeScript definitions
+├── styles/                   # Global styles & Tailwind config
+└── content/                  # CMS content (AGENTS.md)
+```
 
-## Security Architecture Guidelines
+## Development Standards
 
-### 1. Rate Limiting Implementation (HIGH PRIORITY)
-**Context**: Addressing SEC-2025-001 vulnerability
+### TypeScript Configuration
+- **Strict Mode**: All strict flags enabled
+- **Path Mapping**: `@/` alias points to `src/`
+- **Module System**: ESM with top-level await
+- **Target**: ESNext for modern browsers
 
+### Code Quality Requirements
 ```typescript
-// Required: Redis-backed rate limiting
-import { rateLimit } from 'express-rate-limit';
-import RedisStore from 'rate-limit-redis';
-import Redis from 'ioredis';
+// Import order (enforced by ESLint)
+// 1. React and React-related
+import React, { useState, useEffect } from 'react'
 
-// CRITICAL: Always use Redis store in production
-const rateLimiter = rateLimit({
-  store: new RedisStore({
-    sendCommand: (...args: string[]) => redis.call(...args),
-  }),
+// 2. Third-party libraries (alphabetical)
+import { clsx } from 'clsx'
+import { motion } from 'framer-motion'
+
+// 3. Internal components
+import { Button } from '@/components/ui/button'
+
+// 4. Internal utilities  
+import { cn } from '@/lib/utils'
+
+// 5. Type-only imports (last)
+import type { ComponentProps } from '@/types'
+```
+
+### Component Standards
+- **Functional Components**: Use function declarations, not arrow functions
+- **Props Interface**: Always define TypeScript interfaces
+- **Default Props**: Use ES6 default parameters
+- **Error Boundaries**: Wrap feature components
+- **Accessibility**: WCAG 2.1 AA compliance required
+
+### Testing Requirements
+```typescript
+// Every component must have tests
+// File: ComponentName.test.tsx
+import { render, screen } from '@testing-library/react'
+import { ComponentName } from './ComponentName'
+
+test('renders component correctly', () => {
+  render(<ComponentName />)
+  expect(screen.getByRole('...')).toBeInTheDocument()
+})
+```
+
+## Security Implementation (Critical)
+
+### Content Security Policy
+```typescript
+// All routes must implement CSP headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'sha256-HASH'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+}))
+```
+
+### Rate Limiting (Required)
+```typescript
+// Redis-backed rate limiting for all API routes
+import rateLimit from 'express-rate-limit'
+import RedisStore from 'rate-limit-redis'
+
+const limiter = rateLimit({
+  store: new RedisStore({ client: redisClient }),
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP',
-  standardHeaders: true,
-  legacyHeaders: false,
-  // Cluster-aware configuration
-  skipSuccessfulRequests: false,
-  skipFailedRequests: false,
-});
+  max: 100, // requests per window
+})
 ```
 
-**Implementation Requirements**:
-- ✅ Redis connection with automatic failover
-- ✅ Environment-specific rate limits (dev/staging/prod)
-- ✅ Monitoring and alerting for rate limit breaches
-- ✅ Graceful degradation if Redis unavailable
+## Performance Standards
 
-### 2. Content Security Policy with SRI (MEDIUM PRIORITY)
-**Context**: Addressing SEC-2025-002 vulnerability
+### Bundle Targets (Enforced)
+- **Main Bundle**: < 250KB gzipped
+- **First Contentful Paint**: < 1.8s
+- **Largest Contentful Paint**: < 2.5s
+- **Cumulative Layout Shift**: < 0.1
 
+### Code Splitting Pattern
 ```typescript
-// Required: SRI-enhanced CSP configuration
-export const createCspDirectives = (nonce: string) => ({
-  defaultSrc: ["'self'"],
-  scriptSrc: [
-    "'self'",
-    `'nonce-${nonce}'`,
-    // CRITICAL: All external scripts must have integrity hashes
-    "'sha256-<computed-hash-for-plausible>'",
-  ],
-  styleSrc: [
-    "'self'",
-    "'unsafe-inline'", // Only for Tailwind, replace with hashes
-    "https://fonts.googleapis.com",
-  ],
-  fontSrc: [
-    "'self'",
-    "https://fonts.gstatic.com",
-  ],
-  // MANDATORY: SRI verification for all external resources
-  requireSriFor: ['script', 'style'],
-});
+// Route-level splitting (required)
+const HomePage = lazy(() => import('@/pages/Home'))
+const ArticlesPage = lazy(() => import('@/pages/Articles'))
+
+// Component-level splitting for heavy features
+const NewsletterWidget = lazy(() => 
+  import('@/components/features/Newsletter')
+)
 ```
 
-**SRI Hash Generation**:
+## Validation & CI/CD
+
+### Pre-Commit Validation
 ```bash
-# Generate SRI hashes for all external resources
-openssl dgst -sha256 -binary script.js | openssl base64 -A
+# Automated via Husky (runs on every commit)
+pnpm lint                     # ESLint + TypeScript
+pnpm test                     # All tests with coverage
+pnpm build                    # Production build verification
+pnpm audit                    # Security vulnerabilities
 ```
 
-### 3. Environment Variable Validation (LOW PRIORITY)
-**Context**: Addressing SEC-2025-003 vulnerability
-
-```typescript
-// Required: Comprehensive environment validation
-import { z } from 'zod';
-
-const EnvironmentSchema = z.object({
-  NODE_ENV: z.enum(['development', 'staging', 'production']),
-  PORT: z.coerce.number().min(1000).max(65535).default(3000),
-  CORS_ORIGIN: z.string().url().min(1),
-  REDIS_URL: z.string().url().optional(),
-  JWT_SECRET: z.string().min(32),
-  DATABASE_URL: z.string().url(),
-  LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
-  // Security-specific variables
-  CSP_REPORT_URI: z.string().url().optional(),
-  SECURITY_HEADERS_ENABLED: z.boolean().default(true),
-});
-
-// CRITICAL: Validate on startup, fail fast if invalid
-export const validateEnvironment = () => {
-  const result = EnvironmentSchema.safeParse(process.env);
-  if (!result.success) {
-    console.error('❌ Environment validation failed:', result.error.format());
-    process.exit(1);
-  }
-  return result.data;
-};
-```
-
-## Performance Optimization Guidelines
-
-### 4. Service Worker Implementation (MEDIUM PRIORITY)
-**Context**: Addressing PERF-2025-001
-
-```typescript
-// Required: Workbox service worker configuration
-import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching';
-import { registerRoute } from 'workbox-routing';
-import { CacheFirst, NetworkFirst } from 'workbox-strategies';
-
-// CRITICAL: Cache strategy for different resource types
-registerRoute(
-  ({ request }) => request.destination === 'image',
-  new CacheFirst({
-    cacheName: 'images',
-    plugins: [{
-      cacheKeyWillBeUsed: async ({ request }) => {
-        return `${request.url}?v=${BUILD_VERSION}`;
-      },
-    }],
-  })
-);
-
-registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/'),
-  new NetworkFirst({
-    cacheName: 'api-cache',
-    networkTimeoutSeconds: 3,
-  })
-);
-```
-
-### 5. Bundle Analysis Integration (LOW PRIORITY)
-**Context**: Addressing PERF-2025-002
-
+### GitHub Actions Pipeline
 ```yaml
-# Required: GitHub Actions bundle analysis
-name: Bundle Analysis
-on: [pull_request]
+# .github/workflows/ci.yml
+name: CI/CD Pipeline
+on: [push, pull_request]
+
 jobs:
-  bundle-analysis:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install dependencies
-        run: npm ci
-      - name: Build and analyze
-        run: |
-          npm run build
-          npm run analyze
-      - name: Bundle size check
-        run: |
-          # Fail if main bundle exceeds 250KB
-          BUNDLE_SIZE=$(stat -c%s dist/assets/*.js | head -1)
-          if [ $BUNDLE_SIZE -gt 256000 ]; then
-            echo "❌ Bundle too large: ${BUNDLE_SIZE} bytes"
-            exit 1
-          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
 ```
 
-## Quality & Testing Standards
+## Pull Request Guidelines
 
-### 6. Error Handling Standardization (MEDIUM PRIORITY)
-**Context**: Addressing QUAL-2025-001
+### PR Title Format
+```
+[area] Brief description
 
-```typescript
-// Required: Standardized error response interface
-interface StandardErrorResponse {
-  success: false;
-  error: {
-    message: string;
-    code: string;
-    field?: string;
-    correlationId: string;
-    timestamp: string;
-  };
-  meta: {
-    requestId: string;
-    version: string;
-  };
-}
-
-// CRITICAL: Error handling middleware with correlation IDs
-export const errorHandler = (
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const correlationId = req.headers['x-correlation-id'] || generateId();
-  
-  logger.error('Request failed', {
-    error: err.message,
-    stack: err.stack,
-    correlationId,
-    path: req.path,
-    method: req.method,
-  });
-
-  const response: StandardErrorResponse = {
-    success: false,
-    error: {
-      message: err.message,
-      code: determineErrorCode(err),
-      correlationId,
-      timestamp: new Date().toISOString(),
-    },
-    meta: {
-      requestId: correlationId,
-      version: process.env.APP_VERSION || 'unknown',
-    },
-  };
-
-  res.status(determineStatusCode(err)).json(response);
-};
+Examples:
+[ui] Add loading states to Button component
+[pages] Implement article search with filters
+[security] Update CSP directives and add SRI hashes
+[perf] Optimize image loading with WebP/AVIF
 ```
 
-## Development Workflow (Security-Enhanced)
+### PR Checklist
+- [ ] All tests pass (`pnpm test`)
+- [ ] TypeScript compiles (`pnpm build`)
+- [ ] ESLint passes (`pnpm lint`)
+- [ ] Bundle size reviewed (`pnpm analyze`)
+- [ ] Security implications considered
+- [ ] Accessibility tested (keyboard nav, screen reader)
+- [ ] Performance impact assessed
 
-### Pre-Development Security Checks
+## Task-Specific Guidelines for AI Agents
+
+### When Working on UI Components
+- Always reference `src/components/AGENTS.md` for component patterns
+- Use `src/components/ui/AGENTS.md` for design system primitives
+- Implement proper TypeScript interfaces and prop validation
+- Include unit tests with good coverage
+
+### When Working on Performance
+- Reference `src/performance/AGENTS.md` for optimization strategies
+- Monitor bundle size with `pnpm analyze`
+- Implement proper code splitting and lazy loading
+- Use React 18 concurrent features (Suspense, startTransition)
+
+### When Working on Content
+- Reference `content/AGENTS.md` for CMS integration patterns
+- Ensure proper content sanitization and security
+- Implement SEO optimization and structured data
+- Follow GDPR compliance requirements
+
+## Environment Configuration
+
+### Required Environment Variables
 ```bash
-# MANDATORY: Run before any development
-npm run security:pre-flight
-
-# Includes:
-# 1. Dependency vulnerability scan
-# 2. Environment validation
-# 3. Security configuration verification
-# 4. Rate limiting Redis connectivity test
+# .env.local
+NODE_ENV=development
+PORT=3000
+VITE_APP_NAME="ArtOfficial Intelligence"
+REDIS_URL=redis://localhost:6379
+CSP_REPORT_URI=https://your-csp-endpoint.com
 ```
 
-### Task-Specific Guidelines for AI Agents
-
-#### When Working on Security Issues (Priority: HIGH/MEDIUM)
-- **Always validate**: Check current security configuration before changes
-- **Test thoroughly**: Include edge cases and failure scenarios
-- **Document changes**: Update security documentation
-- **Monitor impact**: Verify no regressions in security posture
-
-#### When Working on Performance Issues (Priority: MEDIUM/LOW)
-- **Measure first**: Establish baseline metrics before optimization
-- **Progressive enhancement**: Ensure graceful degradation
-- **Bundle awareness**: Monitor bundle size impact
-- **Cache strategies**: Implement appropriate caching levels
-
-## Success Metrics
-
-### Security Metrics
-- ✅ Zero high/critical vulnerabilities
-- ✅ 100% rate limit coverage on public endpoints
-- ✅ All external resources with SRI verification
-- ✅ Environment validation passes on all deployments
-
-### Performance Metrics  
-- ✅ Main bundle < 250KB gzipped
-- ✅ Cache hit ratio > 90% for static assets
-- ✅ Service worker coverage for offline functionality
-- ✅ Core Web Vitals scores > 90
+### Development Dependencies
+```json
+{
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
+```
 
 ---
 
-**Configuration Version**: 2.0.0 (Audit Remediation)  
+**Repository Version**: 3.0.0 (Enterprise Security + Performance Excellence)  
 **Last Updated**: June 29, 2025  
-**Security Audit**: Compliant with findings SEC-2025-001 through COMP-2025-001
+**Codex Compatibility**: Optimized for latest OpenAI Codex patterns  
+**Stack**: React 18.3+, TypeScript 5.4+, Vite 5.4+, pnpm 9.0+
