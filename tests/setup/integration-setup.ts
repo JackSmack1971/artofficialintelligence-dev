@@ -1,8 +1,9 @@
+import { TextEncoder } from 'util'
+
 import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { toHaveNoViolations } from 'jest-axe'
 import { afterEach, expect, vi } from 'vitest'
-import { TextEncoder } from 'util'
 
 if (!global.TextEncoder) {
   global.TextEncoder = TextEncoder
