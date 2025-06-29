@@ -6,7 +6,10 @@ export default defineConfig({
   resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
   test: {
     environment: 'jsdom',
-    setupFiles: ['./tests/setup/integration-setup.ts'],
+    setupFiles: [
+      './tests/setup/integration-setup.ts',
+      './tests/setup/service-worker-mock.ts'
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],

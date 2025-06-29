@@ -41,7 +41,7 @@ export const ServiceWorkerProvider: React.FC<Props> = ({ children }) => {
     })
     return () => {
       if (reg && typeof reg.unregister === 'function') {
-        reg.unregister().catch(() => {})
+        void Promise.resolve(reg.unregister()).catch(() => {})
       }
     }
   }, [])
