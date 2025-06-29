@@ -46,7 +46,7 @@ const nextConfig = {
           },
           {
             key: 'Referrer-Policy',
-            value: 'no-referrer'
+            value: 'strict-origin-when-cross-origin'
           },
           {
             key: 'Permissions-Policy',
@@ -58,15 +58,33 @@ const nextConfig = {
     ];
   },
 
+  experimental: {
+    webpackMemoryOptimizations: true,
+    webpackBuildWorker: true,
+  },
+
   // Security-aware image optimization
   images: {
-    domains: ['secure-cdn.example.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'secure-cdn.example.com',
+        port: '',
+        pathname: '/**', // Allow any path on the secure CDN
+      },
+    ],
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   // Bundle security
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config, { dev, isServer, webpack }) => { // Added webpack to destructuring
+    if (config.cache && !dev) { // Added cache disabling logic
+      config.cache = Object.freeze({
+        type: 'memory',
+      });
+    }
+
     if (!dev && !isServer) {
       // Enable bundle analysis in CI
       if (process.env.ANALYZE === 'true') {
