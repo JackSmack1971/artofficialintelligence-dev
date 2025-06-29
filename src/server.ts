@@ -9,6 +9,11 @@ import RedisStore from 'rate-limit-redis'
 import { createClient } from 'redis'
 
 import { logger } from './lib/logger.js'
+import {
+  HttpError,
+  errorHandler,
+  requestIdMiddleware
+} from './server/errors.js'
 import { securityMiddleware } from './server/security.js'
 
 class ConfigurationError extends Error {
@@ -37,7 +42,7 @@ function createCorsOptions() {
       if (!origin || whitelist.includes(origin)) {
         callback(null, true)
       } else {
-        callback(new Error('Not allowed by CORS'))
+        callback(new HttpError('Not allowed by CORS', 403, 'INVALID_ORIGIN'))
       }
     }
   }
@@ -83,6 +88,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
   const app = express()
   app.set('trust proxy', 1)
+  app.use(requestIdMiddleware())
   app.use(cors(createCorsOptions()))
 
   const enforceHttps = (req: Request, res: Response, next: NextFunction) => {
@@ -105,7 +111,7 @@ export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
         const safeHtml = html.split('__CSP_NONCE__').join(res.locals.nonce)
         res.type('html').send(safeHtml)
       } catch (error) {
-        next(error)
+        next(new HttpError('Failed to load index', 500))
       }
     }
   )
@@ -120,6 +126,9 @@ export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
   )
 
   app.use(express.static(distDir))
+
+  app.use((_req, _res, next) => next(new HttpError('Not Found', 404)))
+  app.use(errorHandler)
 
   return app
 }
