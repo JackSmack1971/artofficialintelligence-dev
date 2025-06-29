@@ -29,6 +29,7 @@ describe('server nonce', () => {
     const app = createServer(tmpDir)
     const res = await request(app).get('/')
     expect(res.status).toBe(200)
+    expect(res.headers['x-correlation-id']).toBeTruthy()
     const csp = res.headers['content-security-policy'] as string
     const nonceMatch = csp.match(/nonce-([^';]+)/)
     expect(nonceMatch).toBeTruthy()
@@ -47,6 +48,8 @@ describe('server nonce', () => {
     const app = createServer(tmpDir)
     const res = await request(app).get('/')
     expect(res.status).toBe(500)
+    expect(res.body.success).toBe(false)
+    expect(res.body.meta.correlationId).toBeTruthy()
   })
 
   it('startServer returns http.Server', async () => {
@@ -131,7 +134,8 @@ describe('server nonce', () => {
     await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
     const app = createServer(tmpDir)
     const res = await request(app).get('/').set('Origin', 'http://bad.com')
-    expect(res.status).toBe(500)
+    expect(res.status).toBe(403)
+    expect(res.body.error.code).toBe('INVALID_ORIGIN')
   })
 })
 
