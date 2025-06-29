@@ -38,6 +38,17 @@ pnpm build    # Verify production build
 pnpm analyze  # Build with bundle analyzer enabled
 ```
 
+## Environment Variables
+
+Copy `.env.example` to `.env.local` and adjust values for your environment:
+
+```bash
+cp .env.example .env.local
+```
+
+`REDIS_URL` must point to your Redis instance. In production the server uses
+Redis for rate limiting so limits persist across restarts.
+
 ### Bundle Analysis
 
 Run `pnpm analyze` to create `dist/stats.html` using the bundle visualizer.

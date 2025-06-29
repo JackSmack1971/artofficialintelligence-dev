@@ -1,8 +1,9 @@
 import '@testing-library/jest-dom/vitest'
-import { render, screen, waitFor } from './utils/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import About from '@/pages/About'
+
+import { render, screen, waitFor } from './utils/test-utils'
 
 describe('About page', () => {
   it('renders site identity content', () => {

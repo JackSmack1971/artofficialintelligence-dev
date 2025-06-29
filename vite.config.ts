@@ -1,11 +1,11 @@
+import { randomBytes } from 'crypto'
 import { createRequire } from 'module'
 import path from 'path'
 
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { defineConfig, type Plugin } from 'vite'
+import { type Plugin, defineConfig } from 'vite'
 import { imagetools } from 'vite-imagetools'
-import { randomBytes } from 'crypto'
 const require = createRequire(import.meta.url)
 let compressPlugin: (() => unknown) | null = null
 if (process.env.USE_COMPRESS_PLUGIN === 'true') {
