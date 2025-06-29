@@ -1,417 +1,418 @@
-# Content Management System - AI Agent Configuration
-# /content/AGENTS.md
+## System Overview & Security Context
 
-## System Overview
+This AGENTS.md file orchestrates AI-powered content management within an enterprise-grade editorial workflow system with **enhanced security controls** and **audit compliance**. It integrates with headless CMS architecture, automated editorial workflows, and multi-channel publishing platforms while maintaining strict security standards.
 
-This AGENTS.md file orchestrates AI-powered content management within an enterprise-grade editorial workflow system. It integrates with headless CMS architecture, automated editorial workflows, and multi-channel publishing platforms.
+**🚨 SECURITY CONTEXT**: All content operations must comply with:
+- GDPR data protection requirements (COMP-2025-001)
+- Secure API communication protocols
+- Content sanitization and validation standards
+- Performance optimization requirements
 
-## Core Agent Definitions
+## Security-Enhanced Agent Definitions
 
-### Content Strategy Agent
-**Role**: Strategic content planning and ideation
-**Capabilities**: Market analysis, content gap identification, editorial calendar optimization
+### Content Strategy Agent (Security-Aware)
+**Role**: Strategic content planning with security and compliance integration
+**Security Level**: MEDIUM - Access to analytics and market data
 
 ```yaml
-name: content_strategist
+name: content_strategist_secure
 model: gpt-4-turbo
 temperature: 0.7
 max_tokens: 2000
 system_prompt: |
-  You are an expert Content Strategist for an enterprise news and analysis platform. Your role is to:
+  You are an expert Content Strategist for an enterprise news platform with STRICT SECURITY REQUIREMENTS.
   
-  1. **Strategic Planning**: Analyze market trends, competitor content, and audience engagement data
-  2. **Content Ideation**: Generate high-value content ideas aligned with business objectives
-  3. **Editorial Calendar**: Optimize publication schedules for maximum engagement
-  4. **Performance Analysis**: Evaluate content performance and recommend improvements
+  **PRIMARY RESPONSIBILITIES**:
+  1. **Strategic Planning**: Analyze market trends while respecting data privacy
+  2. **Content Ideation**: Generate ideas that comply with content policies
+  3. **Editorial Calendar**: Optimize schedules considering security maintenance windows
+  4. **Performance Analysis**: Evaluate metrics without exposing sensitive data
   
-  **Context Access**: You have access to:
-  - Analytics dashboards (Google Analytics 4, Mixpanel)
-  - Competitor analysis tools
-  - Audience engagement metrics
-  - SEO performance data
+  **SECURITY REQUIREMENTS**:
+  - Never process or store PII without explicit consent
+  - Sanitize all user-generated content inputs
+  - Validate data sources for authenticity
+  - Respect content licensing and copyright restrictions
   
-  **Output Format**: Provide actionable recommendations with data-driven justifications.
-  Always include confidence ratings and success metrics for your suggestions.
+  **COMPLIANCE MANDATES**:
+  - GDPR Article 6 (lawful basis) compliance for all data processing
+  - Content accessibility standards (WCAG 2.1 Level AA)
+  - SEO best practices with security headers consideration
+  
+  **ERROR HANDLING**: Use standardized error responses with correlation IDs.
+  Always include confidence ratings and success metrics for suggestions.
 
 functions:
-  - analyze_market_trends
-  - generate_content_ideas
-  - optimize_publishing_schedule
-  - evaluate_content_performance
+  - analyze_market_trends_secure
+  - generate_content_ideas_validated
+  - optimize_publishing_schedule_compliant
+  - evaluate_content_performance_privacy_safe
 ```
 
-### Content Creation Agent
-**Role**: AI-assisted content generation and optimization
-**Capabilities**: Article writing, SEO optimization, multi-format content creation
+### Content Creation Agent (Enhanced Security)
+**Role**: AI-assisted content generation with security validation
+**Security Level**: HIGH - Content creation and publication access
 
 ```yaml
-name: content_creator
+name: content_creator_secure
 model: gpt-4-turbo
 temperature: 0.6
 max_tokens: 4000
 system_prompt: |
-  You are an expert Content Creator specializing in enterprise-grade journalism and analysis.
+  You are an expert Content Creator with ENTERPRISE SECURITY CLEARANCE.
   
-  **Primary Functions**:
-  1. **Content Generation**: Create high-quality articles, analysis pieces, and news content
-  2. **SEO Optimization**: Ensure content meets search engine optimization standards
-  3. **Multi-format Adaptation**: Adapt content for web, social media, newsletters, and RSS
-  4. **Quality Assurance**: Maintain editorial standards and brand voice consistency
+  **SECURITY-FIRST CONTENT CREATION**:
+  1. **Content Generation**: Create secure, validated content
+  2. **Input Sanitization**: Validate and sanitize all user inputs
+  3. **SEO Security**: Implement SEO without compromising security headers
+  4. **Multi-format Safety**: Ensure all output formats maintain security standards
   
-  **Technical Requirements**:
-  - Integrate with Contentful/Strapi CMS APIs
-  - Follow established content taxonomy and tagging systems
-  - Ensure readability scores of 70+ (Flesch-Kincaid scale)
-  - Comply with accessibility standards (WCAG 2.1 AA)
+  **MANDATORY SECURITY CHECKS**:
+  - Validate all external links for safety and authenticity
+  - Sanitize HTML content to prevent XSS attacks
+  - Ensure image optimization doesn't expose metadata
+  - Verify content doesn't contain sensitive information leaks
   
-  **Workflow Integration**: 
-  - Transition content through defined workflow states (draft → review → editing)
-  - Trigger appropriate notifications and assignments
-  - Update project management tools (Notion, Airtable, Monday.com)
+  **COMPLIANCE REQUIREMENTS**:
+  - Content must pass automated security scanning
+  - All media assets require proper licensing verification
+  - Social media content must include appropriate privacy settings
+  - Newsletter content must respect unsubscribe regulations
+  
+  **OUTPUT VALIDATION**: Every piece of content must be validated against:
+  - Security policy compliance
+  - Brand guidelines adherence
+  - Legal and regulatory requirements
+  - Performance optimization standards
 
 functions:
-  - generate_article_content
-  - optimize_for_seo
-  - create_social_media_variants
-  - check_readability_score
-  - update_cms_content
+  - create_secure_content
+  - validate_content_security
+  - optimize_seo_safely
+  - generate_multi_format_secure
 ```
 
-### Editorial Review Agent
-**Role**: Automated content review and quality assurance
-**Capabilities**: Fact-checking, style compliance, editorial feedback
+### Editorial Review Agent (Compliance-Focused)
+**Role**: Security-aware content review and approval
+**Security Level**: HIGH - Editorial decision making authority
 
 ```yaml
-name: editorial_reviewer
-model: claude-3-sonnet
-temperature: 0.3
-max_tokens: 3000
-system_prompt: |
-  You are an expert Editorial Reviewer with deep expertise in journalism standards and quality assurance.
-  
-  **Review Responsibilities**:
-  1. **Fact Verification**: Cross-reference claims with authoritative sources
-  2. **Editorial Standards**: Ensure compliance with style guide and editorial policies
-  3. **Quality Assessment**: Evaluate content clarity, structure, and engagement potential
-  4. **Revision Recommendations**: Provide specific, actionable feedback for improvements
-  
-  **Review Criteria**:
-  - Accuracy: All facts verified against primary sources
-  - Clarity: Information presented clearly and logically
-  - Completeness: All necessary context and background provided
-  - Bias Detection: Identify and flag potential bias or unbalanced reporting
-  - Legal Compliance: Flag potential legal issues or required disclaimers
-  
-  **Output Requirements**:
-  - Structured review reports with scoring (1-10 scale)
-  - Specific revision recommendations with priority levels
-  - Approval/rejection decisions with detailed justifications
-
-functions:
-  - fact_check_content
-  - analyze_editorial_quality
-  - detect_bias_issues
-  - generate_review_report
-  - recommend_revisions
-```
-
-### Publication Automation Agent
-**Role**: Multi-channel content distribution and optimization
-**Capabilities**: Cross-platform publishing, social media optimization, newsletter management
-
-```yaml
-name: publication_manager
+name: editorial_reviewer_secure
 model: gpt-4-turbo
-temperature: 0.4
+temperature: 0.3
 max_tokens: 2000
 system_prompt: |
-  You are a Publication Manager responsible for optimizing content distribution across multiple channels.
+  You are a SENIOR EDITORIAL REVIEWER with security and compliance expertise.
   
-  **Distribution Channels**:
-  1. **Website Publishing**: Deploy to primary website with proper formatting
-  2. **Social Media**: Create optimized posts for Twitter, LinkedIn, Facebook
-  3. **Newsletter Integration**: Format content for email distribution
-  4. **RSS Feeds**: Update syndication feeds
-  5. **Third-party Platforms**: Distribute to Medium, industry publications
+  **ENHANCED REVIEW RESPONSIBILITIES**:
+  1. **Security Review**: Validate content for security vulnerabilities
+  2. **Compliance Verification**: Ensure regulatory compliance
+  3. **Quality Assurance**: Maintain editorial standards with security awareness
+  4. **Risk Assessment**: Identify potential legal or security risks
   
-  **Optimization Tasks**:
-  - A/B test headlines and social media copy
-  - Schedule publications for optimal engagement times
-  - Generate platform-specific content variants
-  - Monitor publication performance and adjust strategies
+  **SECURITY REVIEW CHECKLIST**:
+  - [ ] Content contains no executable code or suspicious links
+  - [ ] All external references are verified and safe
+  - [ ] PII is properly handled or anonymized
+  - [ ] Content complies with data protection regulations
+  - [ ] Images and media are properly licensed and secure
   
-  **Technical Integration**:
-  - Connect with social media APIs (Twitter, LinkedIn, Facebook)
-  - Interface with email marketing platforms (Mailchimp, SendGrid)
-  - Update content management systems and analytics
+  **COMPLIANCE VERIFICATION**:
+  - [ ] GDPR compliance for any personal data mentioned
+  - [ ] Copyright and licensing requirements met
+  - [ ] Accessibility standards (WCAG 2.1) compliance
+  - [ ] Brand guidelines and security policies adherence
+  
+  **APPROVAL CRITERIA**:
+  Content must achieve minimum scores in:
+  - Security assessment: 95%+
+  - Quality metrics: 90%+
+  - Compliance verification: 100%
+  - Performance optimization: 85%+
 
 functions:
-  - publish_to_website
-  - create_social_media_posts
-  - schedule_newsletter_content
-  - update_rss_feeds
-  - monitor_publication_metrics
+  - review_content_security
+  - verify_compliance_standards
+  - assess_publication_risk
+  - approve_with_security_clearance
 ```
 
-## Workflow Integration
-
-### State Machine Integration
-Connect with the ContentWorkflowEngine to automate editorial progression:
+### Publication Manager Agent (Security-Hardened)
+**Role**: Secure multi-channel content distribution
+**Security Level**: CRITICAL - Production deployment access
 
 ```yaml
-workflow_triggers:
+name: publication_manager_secure
+model: gpt-4-turbo
+temperature: 0.2
+max_tokens: 1500
+system_prompt: |
+  You are a PUBLICATION MANAGER with CRITICAL SECURITY CLEARANCE.
+  
+  **SECURE DISTRIBUTION RESPONSIBILITIES**:
+  1. **Secure Publishing**: Deploy content with security validations
+  2. **Channel Security**: Ensure all publication channels are secure
+  3. **Performance Monitoring**: Track security metrics during publication
+  4. **Incident Response**: Handle security issues during publication
+  
+  **SECURITY-FIRST PUBLICATION PROCESS**:
+  1. Pre-publication security scan (100% required)
+  2. Secure channel authentication verification
+  3. Content integrity validation during transfer
+  4. Post-publication security monitoring
+  5. Rollback capability for security incidents
+  
+  **CHANNEL SECURITY REQUIREMENTS**:
+  - Website: HTTPS only, security headers validated
+  - Social Media: OAuth tokens secured, content sanitized
+  - Newsletter: DKIM/SPF configured, GDPR compliant
+  - RSS Feeds: Content sanitized, no sensitive data exposure
+  - APIs: Authentication verified, rate limits enforced
+  
+  **MONITORING AND ALERTING**:
+  - Real-time security event monitoring
+  - Performance impact assessment
+  - Compliance status tracking
+  - Automated rollback on security violations
+
+functions:
+  - publish_with_security_validation
+  - monitor_publication_security
+  - handle_security_incidents
+  - verify_channel_integrity
+```
+
+## Security-Enhanced Workflow Integration
+
+### Secure State Machine Integration
+Connect with ContentWorkflowEngine using security checkpoints:
+
+```yaml
+secure_workflow_triggers:
   content_creation:
-    - trigger: "start_writing"
-    - agent: content_creator
-    - next_state: "draft"
+    - trigger: "start_secure_writing"
+    - security_check: "validate_author_clearance"
+    - agent: content_creator_secure
+    - next_state: "draft_security_pending"
     
-  content_review:
-    - trigger: "submit_for_review"
-    - agent: editorial_reviewer
-    - next_state: "review"
+  security_review:
+    - trigger: "submit_for_security_review"
+    - security_check: "scan_content_vulnerabilities"
+    - agent: editorial_reviewer_secure
+    - next_state: "security_review"
     
-  content_revision:
-    - trigger: "request_revision"
-    - agent: content_creator
-    - next_state: "revision"
+  compliance_check:
+    - trigger: "verify_compliance"
+    - security_check: "gdpr_compliance_validation"
+    - agent: editorial_reviewer_secure
+    - next_state: "compliance_verified"
     
-  content_approval:
-    - trigger: "approve_for_publication"
-    - agent: publication_manager
-    - next_state: "scheduled"
+  secure_publication:
+    - trigger: "approve_for_secure_publication"
+    - security_check: "final_security_clearance"
+    - agent: publication_manager_secure
+    - next_state: "published_secure"
 ```
 
-### API Integration Endpoints
+### Security-Enhanced API Integration
 
 ```yaml
-api_integrations:
+secure_api_integrations:
   cms_endpoints:
-    contentful: "https://api.contentful.com/spaces/{space_id}"
-    strapi: "https://api.strapi.io/v4"
+    contentful: 
+      url: "https://api.contentful.com/spaces/{space_id}"
+      auth: "Bearer ${CONTENTFUL_ACCESS_TOKEN}"
+      security: "TLS 1.3, API key rotation enabled"
+    strapi: 
+      url: "https://api.strapi.io/v4"
+      auth: "JWT with refresh tokens"
+      security: "Rate limited, input validation"
     
-  project_management:
-    notion: "https://api.notion.com/v1"
-    airtable: "https://api.airtable.com/v0"
-    monday: "https://api.monday.com/v2"
+  security_services:
+    content_scanner: "https://api.security-scanner.internal/v1/scan"
+    compliance_validator: "https://api.compliance.internal/v1/validate"
+    threat_detection: "https://api.threat-detection.internal/v1/analyze"
     
-  analytics:
-    google_analytics: "https://analyticsreporting.googleapis.com/v4"
-    mixpanel: "https://mixpanel.com/api/2.0"
-    
-  social_media:
-    twitter: "https://api.twitter.com/2"
-    linkedin: "https://api.linkedin.com/v2"
-    facebook: "https://graph.facebook.com/v18.0"
+  monitoring:
+    security_events: "https://api.security-monitor.internal/v1/events"
+    performance_metrics: "https://api.performance.internal/v1/metrics"
+    compliance_status: "https://api.compliance.internal/v1/status"
 ```
 
-## Security and Permissions
+## GDPR Compliance Implementation (COMP-2025-001)
 
-### Role-Based Access Control
+### Privacy-First Content Management
+
+```typescript
+// CRITICAL: GDPR-compliant content handling
+export interface GDPRCompliantContent {
+  id: string;
+  content: string;
+  metadata: {
+    containsPII: boolean;
+    dataProcessingBasis: 'consent' | 'legitimate_interest' | 'contract';
+    retentionPeriod: string;
+    dataSubjects?: string[];
+  };
+  privacy: {
+    consentRequired: boolean;
+    consentObtained?: boolean;
+    consentTimestamp?: string;
+    rightToErasure: boolean;
+    dataPortable: boolean;
+  };
+  security: {
+    encryptionLevel: 'standard' | 'high' | 'maximum';
+    accessRestrictions: string[];
+    auditTrail: AuditEntry[];
+  };
+}
+
+// CRITICAL: Privacy-aware analytics integration
+export const PrivacyCompliantAnalytics = {
+  init() {
+    const consent = this.getConsentStatus();
+    if (consent.analytics) {
+      this.initializePlausible();
+    }
+    this.setupConsentBanner();
+  },
+
+  getConsentStatus(): ConsentPreferences {
+    const stored = localStorage.getItem('gdpr-consent-v2');
+    return stored ? JSON.parse(stored) : this.getDefaultConsent();
+  },
+
+  getDefaultConsent(): ConsentPreferences {
+    return {
+      necessary: true,
+      analytics: false,
+      marketing: false,
+      timestamp: new Date().toISOString(),
+      version: '2.0',
+      ipAddress: null, // Never store IP
+    };
+  },
+
+  updateConsent(preferences: Partial<ConsentPreferences>) {
+    const consent: ConsentPreferences = {
+      ...this.getConsentStatus(),
+      ...preferences,
+      timestamp: new Date().toISOString(),
+      version: '2.0',
+    };
+    
+    localStorage.setItem('gdpr-consent-v2', JSON.stringify(consent));
+    
+    // Security audit log
+    this.logConsentChange(consent);
+    
+    if (consent.analytics) {
+      this.initializePlausible();
+    } else {
+      this.removePlausible();
+    }
+  },
+
+  initializePlausible() {
+    // CRITICAL: Only load if consent given
+    if (!this.getConsentStatus().analytics) return;
+    
+    const script = document.createElement('script');
+    script.defer = true;
+    script.dataset.domain = process.env.REACT_APP_PLAUSIBLE_DOMAIN;
+    script.src = 'https://plausible.io/js/script.js';
+    // CRITICAL: SRI hash required (from SEC-2025-002)
+    script.integrity = 'sha256-[COMPUTED_SRI_HASH]';
+    script.crossOrigin = 'anonymous';
+    
+    // Security nonce from CSP
+    script.nonce = window.__CSP_NONCE__;
+    
+    document.head.appendChild(script);
+  },
+
+  // GDPR Article 17 - Right to erasure
+  exerciseRightToErasure(userId: string) {
+    // Remove all user data and tracking
+    localStorage.removeItem('gdpr-consent-v2');
+    sessionStorage.clear();
+    
+    // API call to remove user data from backend
+    fetch('/api/gdpr/erase', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+    });
+  },
+};
+```
+
+## Performance & Security Monitoring
+
+### Content Security Metrics
 
 ```yaml
-security_roles:
-  content_strategist:
-    permissions:
-      - read: analytics_data, market_research
-      - write: content_ideas, editorial_calendar
-      - execute: trend_analysis, performance_reports
-      
-  content_creator:
-    permissions:
-      - read: content_briefs, style_guides, research_materials
-      - write: draft_content, seo_metadata, social_variants
-      - execute: content_generation, cms_updates
-      
-  editorial_reviewer:
-    permissions:
-      - read: draft_content, fact_sources, editorial_guidelines
-      - write: review_reports, revision_requests, approval_decisions
-      - execute: fact_checking, quality_analysis
-      
-  publication_manager:
-    permissions:
-      - read: approved_content, publication_schedules, performance_data
-      - write: publication_metadata, distribution_schedules
-      - execute: multi_channel_publishing, performance_monitoring
+security_monitoring:
+  content_security:
+    - metric: "content_security_scan_pass_rate"
+    - threshold: "> 95%"
+    - alert: "security_team@company.com"
+    
+  compliance_status:
+    - metric: "gdpr_compliance_score"
+    - threshold: "100%"
+    - alert: "legal_team@company.com"
+    
+  performance_security:
+    - metric: "secure_content_load_time"
+    - threshold: "< 3 seconds"
+    - alert: "dev_team@company.com"
+
+automated_security_checks:
+  pre_publication:
+    - xss_vulnerability_scan
+    - content_policy_compliance
+    - external_link_validation
+    - media_license_verification
+    
+  post_publication:
+    - security_header_verification
+    - performance_impact_assessment
+    - user_engagement_privacy_compliance
+    - analytics_consent_verification
 ```
 
-### Environment Variables
+## Implementation Checklist
 
-```yaml
-required_environment_variables:
-  # CMS Integration
-  CONTENTFUL_SPACE_ID: "Required for Contentful CMS integration"
-  CONTENTFUL_ACCESS_TOKEN: "Content delivery API access"
-  CONTENTFUL_MANAGEMENT_TOKEN: "Content management API access"
-  
-  # AI Model Access
-  OPENAI_API_KEY: "GPT-4 API access for content generation"
-  ANTHROPIC_API_KEY: "Claude API access for editorial review"
-  
-  # Project Management
-  NOTION_INTEGRATION_TOKEN: "Notion workspace integration"
-  AIRTABLE_API_KEY: "Airtable base access"
-  MONDAY_API_TOKEN: "Monday.com board management"
-  
-  # Analytics and Social Media
-  GOOGLE_ANALYTICS_CREDENTIALS: "GA4 reporting API access"
-  MIXPANEL_PROJECT_TOKEN: "User engagement analytics"
-  TWITTER_BEARER_TOKEN: "Twitter API v2 access"
-  LINKEDIN_ACCESS_TOKEN: "LinkedIn Publishing API"
-  
-  # Publication Infrastructure
-  AWS_ACCESS_KEY_ID: "Cloud infrastructure access"
-  AWS_SECRET_ACCESS_KEY: "S3 bucket and CDN management"
-  SENDGRID_API_KEY: "Email newsletter distribution"
-```
+### Phase 1: Security Infrastructure (Week 1)
+- [ ] Implement GDPR consent management system
+- [ ] Set up content security scanning pipeline
+- [ ] Configure secure API authentication
+- [ ] Establish security monitoring and alerting
 
-## Content Quality Standards
+### Phase 2: Content Security (Week 2)
+- [ ] Deploy content validation and sanitization
+- [ ] Implement secure media handling
+- [ ] Configure SRI for all external resources
+- [ ] Set up privacy-compliant analytics
 
-### Automated Quality Checks
+### Phase 3: Compliance & Testing (Week 3)
+- [ ] Complete GDPR compliance implementation
+- [ ] Deploy comprehensive security test suite
+- [ ] Implement automated compliance checking
+- [ ] Configure security incident response
 
-```yaml
-quality_standards:
-  readability:
-    flesch_kincaid_score: ">= 70"
-    average_sentence_length: "<= 20 words"
-    syllable_complexity: "moderate"
-    
-  seo_optimization:
-    title_length: "50-60 characters"
-    meta_description: "150-160 characters"
-    keyword_density: "0.5-2.5%"
-    internal_links: ">= 3 per article"
-    
-  accessibility:
-    heading_structure: "proper h1-h6 hierarchy"
-    alt_text: "required for all images"
-    color_contrast: ">= 4.5:1 ratio"
-    link_descriptions: "descriptive anchor text"
-    
-  editorial_standards:
-    source_verification: "minimum 2 authoritative sources"
-    fact_checking: "automated + manual verification"
-    bias_detection: "political neutrality score >= 7/10"
-    legal_compliance: "disclaimer and attribution checks"
-```
-
-### Performance Metrics
-
-```yaml
-success_metrics:
-  content_quality:
-    - editorial_score: ">= 8.0/10"
-    - reader_engagement: ">= 3 minutes average time"
-    - social_shares: ">= 50 shares per article"
-    - seo_performance: "target keywords in top 10"
-    
-  workflow_efficiency:
-    - time_to_publish: "<= 48 hours from assignment"
-    - revision_cycles: "<= 2 rounds per article"
-    - automation_coverage: ">= 80% of routine tasks"
-    - error_reduction: ">= 90% decrease in manual errors"
-    
-  business_impact:
-    - traffic_growth: ">= 15% monthly increase"
-    - conversion_rate: ">= 3% reader-to-subscriber"
-    - cost_efficiency: ">= 40% reduction in editorial costs"
-    - team_productivity: ">= 60% increase in output"
-```
-
-## Advanced Features
-
-### AI Model Orchestration
-
-```yaml
-model_coordination:
-  content_generation:
-    primary: "gpt-4-turbo"
-    fallback: "gpt-3.5-turbo"
-    cost_optimization: "prompt_compression_enabled"
-    
-  editorial_review:
-    primary: "claude-3-sonnet"
-    fallback: "gpt-4"
-    specialized_tasks: "fact_checking, bias_detection"
-    
-  analytics_processing:
-    primary: "gpt-4-turbo"
-    specialized: "data_analysis, trend_identification"
-    batch_processing: "enabled"
-```
-
-### Integration Monitoring
-
-```yaml
-monitoring_setup:
-  api_health_checks:
-    frequency: "every 5 minutes"
-    endpoints: [cms, analytics, social_media, project_management]
-    alert_threshold: "3 consecutive failures"
-    
-  performance_monitoring:
-    response_times: "< 2 seconds average"
-    error_rates: "< 1% failure rate"
-    throughput: ">= 100 requests/minute"
-    
-  cost_monitoring:
-    ai_api_costs: "daily budget alerts"
-    infrastructure_costs: "monthly spending reports"
-    efficiency_metrics: "cost per published article"
-```
-
-## Implementation Guidelines
-
-### Deployment Checklist
-
-1. **Environment Setup**
-   - [ ] Configure all required environment variables
-   - [ ] Test API connectivity to all integrated services
-   - [ ] Verify security permissions and access controls
-   - [ ] Set up monitoring and alerting systems
-
-2. **Agent Configuration**
-   - [ ] Deploy and test each agent individually
-   - [ ] Verify workflow state transitions
-   - [ ] Test error handling and fallback mechanisms
-   - [ ] Validate output quality against standards
-
-3. **Integration Testing**
-   - [ ] End-to-end workflow testing
-   - [ ] Multi-channel publishing verification
-   - [ ] Performance and scalability testing
-   - [ ] Security vulnerability assessment
-
-4. **Production Readiness**
-   - [ ] Load testing with realistic content volumes
-   - [ ] Backup and disaster recovery procedures
-   - [ ] Team training and documentation
-   - [ ] Gradual rollout with monitoring
-
-### Maintenance and Updates
-
-```yaml
-maintenance_schedule:
-  daily:
-    - Monitor agent performance metrics
-    - Review and address any failed workflows
-    - Update content performance analytics
-    
-  weekly:
-    - Analyze cost optimization opportunities
-    - Review and update content quality standards
-    - Test backup and recovery procedures
-    
-  monthly:
-    - Update AI model configurations
-    - Review and optimize workflow efficiency
-    - Assess integration health and performance
-    - Security audit and compliance review
-```
+### Phase 4: Monitoring & Optimization (Week 4)
+- [ ] Deploy security monitoring dashboard
+- [ ] Optimize performance with security constraints
+- [ ] Complete security documentation
+- [ ] Train team on security procedures
 
 ---
 
-**Configuration Version**: 1.0.0  
-**Last Updated**: June 28, 2025  
-**Compatibility**: OpenAI Codex Enterprise, Contentful/Strapi CMS, Multi-platform publishing  
-**Security Level**: Enterprise-grade with RBAC and comprehensive monitoring
+**Configuration Version**: 2.0.0 (Security & Compliance Enhanced)  
+**Last Updated**: June 29, 2025  
+**Security Level**: Enterprise-grade with comprehensive monitoring  
+**Compliance**: GDPR Article 6 & 7 compliant, WCAG 2.1 Level AA  
+**Audit Status**: Addresses COMP-2025-001, integrates with security remediation plan
