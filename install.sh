@@ -74,7 +74,7 @@ install_nodejs() {
     sudo apt remove -y nodejs npm 2>/dev/null || true
     
     # Install NodeSource repository
-    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
     sudo apt install -y nodejs
     
     # Verify installation
@@ -85,7 +85,7 @@ install_nodejs() {
     print_success "npm installed: $NPM_VERSION"
     
     # Check minimum version requirement
-    if ! node -pe "process.version.slice(1).split('.')[0] >= 18"; then
+    if ! node -pe "process.version.slice(1).split('.')[0] >= 20"; then
         print_error "Node.js version 18+ required. Current: $NODE_VERSION"
         exit 1
     fi
@@ -94,7 +94,8 @@ install_nodejs() {
 # Install pnpm (preferred package manager)
 install_pnpm() {
     print_status "Installing pnpm..."
-    npm install -g pnpm
+    corepack enable
+    corepack prepare pnpm@latest --activate
     
     PNPM_VERSION=$(pnpm --version)
     print_success "pnpm installed: $PNPM_VERSION"
@@ -342,7 +343,7 @@ run_checks() {
     
     # Check Node.js version
     NODE_VERSION=$(node --version | cut -d'v' -f2 | cut -d'.' -f1)
-    if [ "$NODE_VERSION" -ge 18 ]; then
+    if [ "$NODE_VERSION" -ge 20 ]; then
         print_success "Node.js version check passed: $(node --version)"
     else
         print_error "Node.js version check failed. Required: 18+, Found: $(node --version)"
