@@ -10,6 +10,8 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
+      - name: Install pnpm
+        run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm lint
       - run: pnpm test
