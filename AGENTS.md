@@ -1,482 +1,294 @@
-# AGENTS.md - Repository Foundation Configuration
+## Project Overview & Security Context
 
-## Project Overview
+This repository implements a **security-first, audit-compliant React/TypeScript application** with enterprise-grade security controls, comprehensive vulnerability management, and automated security monitoring. Based on recent security audit findings, this configuration prioritizes **zero-trust security**, **performance optimization**, and **compliance requirements**.
 
-This repository implements a **production-ready React/TypeScript application** with enterprise-grade development workflows, comprehensive type safety, and automated CI/CD pipelines. The architecture prioritizes **developer experience**, **code quality**, and **scalable deployment patterns** following industry best practices for 2024-2025.
+**🚨 SECURITY ALERT**: This project has undergone security audit. All development must address identified vulnerabilities systematically.
 
-## Core Technical Stack
+## Current Security Audit Status
+
+### Critical Issues Requiring Immediate Attention
+- **HIGH**: Express rate limiter vulnerability (SEC-2025-001)
+- **MEDIUM**: CSP allows external CDNs without SRI (SEC-2025-002)  
+- **MEDIUM**: Missing service worker for asset caching (PERF-2025-001)
+- **MEDIUM**: Inconsistent error handling patterns (QUAL-2025-001)
+
+### Security-First Development Workflow
+```bash
+# MANDATORY: Security validation before any development
+npm run security:audit
+npm run dependencies:check
+npm run lint:security
+npm run test:security
+```
+
+## Core Technical Stack (Security-Hardened)
 
 - **Frontend**: React 18+, TypeScript 5.0+ (Strict Mode)
-- **Validation**: Zod schemas with runtime type safety
-- **Styling**: Tailwind CSS with custom design system
-- **Testing**: React Testing Library + Jest + Playwright
-- **Build**: Vite/Webpack with performance optimization
-- **Container**: Docker multi-stage builds
-- **CI/CD**: GitHub Actions with security scanning
-- **Quality**: ESLint, Prettier, Husky pre-commit hooks
+- **Security**: Helmet, CSP with SRI, Rate Limiting (Redis-backed)
+- **Validation**: Zod schemas with security sanitization
+- **Testing**: Security-focused test suites with edge cases
+- **Monitoring**: Real-time security event tracking
+- **Compliance**: GDPR-compliant analytics and data handling
 
-## Development Environment Setup
+## Security Architecture Guidelines
 
-### Prerequisites Validation
-Before proceeding with any development tasks:
-
-```bash
-# Verify required tools are installed
-node --version    # Should be >= 18.0.0
-npm --version     # Should be >= 9.0.0
-docker --version  # Should be >= 24.0.0
-git --version     # Should be >= 2.40.0
-```
-
-### Container-First Development
-**Always use the standardized development environment:**
-
-```bash
-# Start development environment
-docker-compose up -d
-
-# Access development container
-docker exec -it app-dev bash
-
-# Alternative: Use VS Code Dev Containers
-# Open project in VS Code and select "Reopen in Container"
-```
-
-### Environment Configuration
-**Never commit secrets to version control:**
-
-```bash
-# Copy environment template
-cp .env.example .env.local
-
-# Configure required variables
-# DB_HOST, DB_PORT, JWT_SECRET, API_KEYS, etc.
-```
-
-## Code Architecture Guidelines
-
-### TypeScript Implementation Standards
-
-#### 1. Strict Type Safety
-**All code must pass TypeScript strict mode compilation:**
+### 1. Rate Limiting Implementation (HIGH PRIORITY)
+**Context**: Addressing SEC-2025-001 vulnerability
 
 ```typescript
-// tsconfig.json requirements
-{
-  "compilerOptions": {
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitReturns": true
-  }
-}
+// Required: Redis-backed rate limiting
+import { rateLimit } from 'express-rate-limit';
+import RedisStore from 'rate-limit-redis';
+import Redis from 'ioredis';
+
+// CRITICAL: Always use Redis store in production
+const rateLimiter = rateLimit({
+  store: new RedisStore({
+    sendCommand: (...args: string[]) => redis.call(...args),
+  }),
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP',
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Cluster-aware configuration
+  skipSuccessfulRequests: false,
+  skipFailedRequests: false,
+});
 ```
 
-#### 2. Zod Schema-First Validation
-**Runtime validation is mandatory for all external data:**
+**Implementation Requirements**:
+- ✅ Redis connection with automatic failover
+- ✅ Environment-specific rate limits (dev/staging/prod)
+- ✅ Monitoring and alerting for rate limit breaches
+- ✅ Graceful degradation if Redis unavailable
+
+### 2. Content Security Policy with SRI (MEDIUM PRIORITY)
+**Context**: Addressing SEC-2025-002 vulnerability
 
 ```typescript
-// Example: API response validation
+// Required: SRI-enhanced CSP configuration
+export const createCspDirectives = (nonce: string) => ({
+  defaultSrc: ["'self'"],
+  scriptSrc: [
+    "'self'",
+    `'nonce-${nonce}'`,
+    // CRITICAL: All external scripts must have integrity hashes
+    "'sha256-<computed-hash-for-plausible>'",
+  ],
+  styleSrc: [
+    "'self'",
+    "'unsafe-inline'", // Only for Tailwind, replace with hashes
+    "https://fonts.googleapis.com",
+  ],
+  fontSrc: [
+    "'self'",
+    "https://fonts.gstatic.com",
+  ],
+  // MANDATORY: SRI verification for all external resources
+  requireSriFor: ['script', 'style'],
+});
+```
+
+**SRI Hash Generation**:
+```bash
+# Generate SRI hashes for all external resources
+openssl dgst -sha256 -binary script.js | openssl base64 -A
+```
+
+### 3. Environment Variable Validation (LOW PRIORITY)
+**Context**: Addressing SEC-2025-003 vulnerability
+
+```typescript
+// Required: Comprehensive environment validation
 import { z } from 'zod';
 
-export const ArticleSchema = z.object({
-  id: z.string().uuid(),
-  title: z.string().min(1).max(200),
-  content: z.string().min(100),
-  publishedAt: z.string().datetime(),
-  // ... additional fields
+const EnvironmentSchema = z.object({
+  NODE_ENV: z.enum(['development', 'staging', 'production']),
+  PORT: z.coerce.number().min(1000).max(65535).default(3000),
+  CORS_ORIGIN: z.string().url().min(1),
+  REDIS_URL: z.string().url().optional(),
+  JWT_SECRET: z.string().min(32),
+  DATABASE_URL: z.string().url(),
+  LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
+  // Security-specific variables
+  CSP_REPORT_URI: z.string().url().optional(),
+  SECURITY_HEADERS_ENABLED: z.boolean().default(true),
 });
 
-export type Article = z.infer<typeof ArticleSchema>;
-
-// Validate API responses
-const validateArticleResponse = (data: unknown): Article => {
-  return ArticleSchema.parse(data);
-};
-```
-
-#### 3. Component Architecture
-**Follow established patterns for component development:**
-
-```typescript
-// Component with proper TypeScript interfaces
-interface ArticleCardProps {
-  article: Article;
-  variant?: 'default' | 'compact' | 'featured';
-  onTagClick?: (tag: string) => void;
-  className?: string;
-  testId?: string;
-}
-
-export const ArticleCard: React.FC<ArticleCardProps> = ({
-  article,
-  variant = 'default',
-  onTagClick,
-  className,
-  testId
-}) => {
-  // Implementation with proper error boundaries
-  // Accessibility compliance (WCAG 2.1)
-  // Performance optimization (React.memo when appropriate)
-};
-```
-
-### Custom Hooks Implementation
-**Extract reusable logic into properly typed custom hooks:**
-
-```typescript
-// hooks/useArticles.ts
-interface UseArticlesOptions {
-  filters?: {
-    status?: ArticleStatus;
-    tags?: string[];
-  };
-  sortBy?: SortBy;
-  enableInfiniteScroll?: boolean;
-}
-
-export const useArticles = (options: UseArticlesOptions = {}) => {
-  // Implement with proper error handling
-  // Include loading states and error boundaries
-  // Return properly typed data and functions
-};
-```
-
-### Error Handling Strategy
-**Implement comprehensive error boundaries:**
-
-```typescript
-// components/ErrorBoundary.tsx
-export class ErrorBoundary extends React.Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
-  // Implement with logging to monitoring service
-  // Provide fallback UI for different error types
-  // Include error reporting and recovery mechanisms
-}
-```
-
-## Testing Requirements
-
-### Test Coverage Standards
-**Maintain minimum 80% test coverage:**
-
-```bash
-# Run test suite
-npm run test              # Unit tests with Jest
-npm run test:integration  # Integration tests
-npm run test:e2e         # End-to-end tests with Playwright
-
-# Coverage reporting
-npm run test:coverage
-```
-
-### Testing Patterns
-**Follow established testing conventions:**
-
-```typescript
-// __tests__/components/ArticleCard.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
-import { ArticleCard } from '../ArticleCard';
-import { mockArticle } from '../../mocks/article-factory';
-
-describe('ArticleCard', () => {
-  it('renders article data correctly', () => {
-    const article = mockArticle();
-    render(<ArticleCard article={article} />);
-    
-    expect(screen.getByText(article.title)).toBeInTheDocument();
-    expect(screen.getByText(article.excerpt)).toBeInTheDocument();
-  });
-
-  it('handles tag click events', () => {
-    const onTagClick = jest.fn();
-    const article = mockArticle({ tags: ['react', 'typescript'] });
-    
-    render(<ArticleCard article={article} onTagClick={onTagClick} />);
-    
-    fireEvent.click(screen.getByText('react'));
-    expect(onTagClick).toHaveBeenCalledWith('react');
-  });
-});
-```
-
-## Code Quality Enforcement
-
-### Pre-commit Hooks
-**Automated quality checks prevent low-quality commits:**
-
-```bash
-# Pre-commit validation runs:
-# 1. ESLint with auto-fix
-# 2. Prettier formatting
-# 3. TypeScript compilation
-# 4. Unit test execution
-# 5. Security vulnerability scanning
-```
-
-### Linting and Formatting
-**Consistent code style is automatically enforced:**
-
-```json
-// .eslintrc.js configuration
-{
-  "extends": [
-    "@typescript-eslint/recommended",
-    "react-hooks/recommended",
-    "prettier"
-  ],
-  "rules": {
-    "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/explicit-function-return-type": "warn",
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+// CRITICAL: Validate on startup, fail fast if invalid
+export const validateEnvironment = () => {
+  const result = EnvironmentSchema.safeParse(process.env);
+  if (!result.success) {
+    console.error('❌ Environment validation failed:', result.error.format());
+    process.exit(1);
   }
-}
+  return result.data;
+};
 ```
 
-## Performance Requirements
+## Performance Optimization Guidelines
 
-### Bundle Optimization
-**Monitor and optimize application performance:**
+### 4. Service Worker Implementation (MEDIUM PRIORITY)
+**Context**: Addressing PERF-2025-001
 
-```bash
-# Performance analysis
-npm run analyze          # Bundle size analysis
-npm run lighthouse       # Performance metrics
-npm run performance:test # Automated performance testing
+```typescript
+// Required: Workbox service worker configuration
+import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching';
+import { registerRoute } from 'workbox-routing';
+import { CacheFirst, NetworkFirst } from 'workbox-strategies';
+
+// CRITICAL: Cache strategy for different resource types
+registerRoute(
+  ({ request }) => request.destination === 'image',
+  new CacheFirst({
+    cacheName: 'images',
+    plugins: [{
+      cacheKeyWillBeUsed: async ({ request }) => {
+        return `${request.url}?v=${BUILD_VERSION}`;
+      },
+    }],
+  })
+);
+
+registerRoute(
+  ({ url }) => url.pathname.startsWith('/api/'),
+  new NetworkFirst({
+    cacheName: 'api-cache',
+    networkTimeoutSeconds: 3,
+  })
+);
 ```
 
-### Performance Standards
-- **Initial Load**: < 3 seconds on 3G networks
-- **Bundle Size**: < 250KB gzipped for main chunk
-- **Lighthouse Score**: > 90 for Performance, Accessibility, Best Practices
-- **Memory Usage**: < 50MB heap size for typical usage
-
-### Implementation Requirements
-- Implement lazy loading for route-based code splitting
-- Use React.memo() for expensive components
-- Implement proper image optimization and responsive loading
-- Configure service worker for caching strategies
-
-## Build and Deployment
-
-### Container Build Process
-**Multi-stage Docker builds optimize for both development and production:**
-
-```dockerfile
-# Dockerfile includes:
-# 1. Development stage with hot-reload
-# 2. Build stage with optimization
-# 3. Production stage with minimal footprint
-# 4. Security hardening and health checks
-```
-
-### CI/CD Pipeline
-**GitHub Actions workflow validates all changes:**
+### 5. Bundle Analysis Integration (LOW PRIORITY)
+**Context**: Addressing PERF-2025-002
 
 ```yaml
-# .github/workflows/ci.yml includes:
-# 1. Code quality checks (lint, format, type-check)
-# 2. Security scanning (npm audit, Trivy)
-# 3. Test execution (unit, integration, e2e)
-# 4. Build validation and performance testing
-# 5. Container security scanning
-# 6. Automated deployment to staging
+# Required: GitHub Actions bundle analysis
+name: Bundle Analysis
+on: [pull_request]
+jobs:
+  bundle-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm ci
+      - name: Build and analyze
+        run: |
+          npm run build
+          npm run analyze
+      - name: Bundle size check
+        run: |
+          # Fail if main bundle exceeds 250KB
+          BUNDLE_SIZE=$(stat -c%s dist/assets/*.js | head -1)
+          if [ $BUNDLE_SIZE -gt 256000 ]; then
+            echo "❌ Bundle too large: ${BUNDLE_SIZE} bytes"
+            exit 1
+          fi
 ```
 
-### Deployment Strategy
-**Blue-green deployment with health monitoring:**
+## Quality & Testing Standards
 
-```bash
-# Deployment process:
-# 1. Build and scan container images
-# 2. Deploy to staging environment
-# 3. Run automated acceptance tests
-# 4. Deploy to production with zero downtime
-# 5. Monitor health and performance metrics
-```
-
-## Security Guidelines
-
-### Security Standards
-**Implement comprehensive security measures:**
-
-- **Authentication**: JWT with secure token management
-- **Authorization**: Role-based access control (RBAC)
-- **Data Validation**: Zod schemas for all inputs
-- **Dependencies**: Regular security audits and updates
-- **Container Security**: Non-root users, minimal images
-- **Secrets Management**: Environment variables, never in code
-
-### Security Scanning
-**Automated security validation:**
-
-```bash
-# Security checks in CI/CD:
-npm audit --audit-level high
-docker run --rm -v "$(pwd)":/app aquasec/trivy fs /app
-```
-
-## Development Workflow
-
-### Branch Strategy
-**Follow GitFlow with protection rules:**
-
-```bash
-# Branch naming conventions:
-feature/TICKET-123-implement-article-search
-bugfix/TICKET-456-fix-pagination-issue
-hotfix/TICKET-789-security-patch
-
-# Protected branches:
-# - main: Production deployments only
-# - develop: Integration branch for features
-```
-
-### Code Review Requirements
-**All changes require peer review:**
-
-- Minimum 2 approvals for production changes
-- Automated CI/CD checks must pass
-- Security review for authentication/authorization changes
-- Performance impact assessment for UI changes
-
-### Feature Development Process
-1. **Create feature branch** from develop
-2. **Implement with tests** following TDD principles
-3. **Run local validation** (tests, linting, security)
-4. **Submit pull request** with comprehensive description
-5. **Address review feedback** and update tests
-6. **Merge after approval** and successful CI/CD
-
-## Monitoring and Observability
-
-### Application Monitoring
-**Implement comprehensive monitoring:**
-
-- **Error Tracking**: Sentry for runtime error monitoring
-- **Performance**: Web Vitals and custom metrics
-- **User Analytics**: Privacy-compliant usage tracking
-- **Infrastructure**: Container health and resource usage
-
-### Logging Strategy
-**Structured logging for production debugging:**
+### 6. Error Handling Standardization (MEDIUM PRIORITY)
+**Context**: Addressing QUAL-2025-001
 
 ```typescript
-// utils/logger.ts
-export const logger = {
-  info: (message: string, context?: Record<string, unknown>) => {
-    // Structured logging implementation
-  },
-  error: (message: string, error?: Error, context?: Record<string, unknown>) => {
-    // Error logging with stack traces and context
-  }
+// Required: Standardized error response interface
+interface StandardErrorResponse {
+  success: false;
+  error: {
+    message: string;
+    code: string;
+    field?: string;
+    correlationId: string;
+    timestamp: string;
+  };
+  meta: {
+    requestId: string;
+    version: string;
+  };
+}
+
+// CRITICAL: Error handling middleware with correlation IDs
+export const errorHandler = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const correlationId = req.headers['x-correlation-id'] || generateId();
+  
+  logger.error('Request failed', {
+    error: err.message,
+    stack: err.stack,
+    correlationId,
+    path: req.path,
+    method: req.method,
+  });
+
+  const response: StandardErrorResponse = {
+    success: false,
+    error: {
+      message: err.message,
+      code: determineErrorCode(err),
+      correlationId,
+      timestamp: new Date().toISOString(),
+    },
+    meta: {
+      requestId: correlationId,
+      version: process.env.APP_VERSION || 'unknown',
+    },
+  };
+
+  res.status(determineStatusCode(err)).json(response);
 };
 ```
 
-## Documentation Standards
+## Development Workflow (Security-Enhanced)
 
-### Code Documentation
-**Comprehensive documentation for maintainability:**
+### Pre-Development Security Checks
+```bash
+# MANDATORY: Run before any development
+npm run security:pre-flight
 
-- **README.md**: Setup instructions and project overview
-- **API Documentation**: OpenAPI/Swagger specifications
-- **Component Stories**: Storybook for UI components
-- **Architecture Decisions**: ADR documents for major decisions
-
-### Inline Documentation
-**JSDoc comments for complex functions:**
-
-```typescript
-/**
- * Fetches paginated articles with filtering and sorting
- * @param options - Configuration for article fetching
- * @param options.page - Page number (1-based)
- * @param options.limit - Number of articles per page
- * @param options.filters - Optional filters for articles
- * @returns Promise resolving to paginated article response
- * @throws {ValidationError} When invalid parameters provided
- * @throws {NetworkError} When API request fails
- */
-export async function fetchArticles(
-  options: FetchArticlesOptions
-): Promise<PaginatedResponse<Article>> {
-  // Implementation with proper error handling
-}
+# Includes:
+# 1. Dependency vulnerability scan
+# 2. Environment validation
+# 3. Security configuration verification
+# 4. Rate limiting Redis connectivity test
 ```
 
-## Task Implementation Guidelines
+### Task-Specific Guidelines for AI Agents
 
-### When Working on Features
-1. **Understand Requirements**: Review specifications and acceptance criteria
-2. **Plan Implementation**: Design components and data flow
-3. **Write Tests First**: Implement test cases before functionality
-4. **Implement Incrementally**: Small, testable commits
-5. **Validate Continuously**: Run tests and quality checks
-6. **Document Changes**: Update relevant documentation
+#### When Working on Security Issues (Priority: HIGH/MEDIUM)
+- **Always validate**: Check current security configuration before changes
+- **Test thoroughly**: Include edge cases and failure scenarios
+- **Document changes**: Update security documentation
+- **Monitor impact**: Verify no regressions in security posture
 
-### When Fixing Bugs
-1. **Reproduce Issue**: Create test case that demonstrates the bug
-2. **Identify Root Cause**: Debug systematically with proper logging
-3. **Implement Fix**: Minimal change that addresses root cause
-4. **Validate Fix**: Ensure test passes and no regressions
-5. **Add Prevention**: Additional tests to prevent similar issues
-
-### When Refactoring Code
-1. **Maintain Functionality**: Existing tests must continue passing
-2. **Improve Design**: Enhance code structure and readability
-3. **Update Tests**: Modify tests if internal structure changes
-4. **Document Changes**: Update comments and documentation
-5. **Performance Impact**: Measure before/after performance
+#### When Working on Performance Issues (Priority: MEDIUM/LOW)
+- **Measure first**: Establish baseline metrics before optimization
+- **Progressive enhancement**: Ensure graceful degradation
+- **Bundle awareness**: Monitor bundle size impact
+- **Cache strategies**: Implement appropriate caching levels
 
 ## Success Metrics
 
-### Code Quality Metrics
-- **TypeScript Strict Mode**: 100% compliance
-- **Test Coverage**: ≥ 80% line coverage
-- **Lint Violations**: 0 errors, minimal warnings
-- **Bundle Size**: < 250KB gzipped main chunk
-- **Performance**: Lighthouse score > 90
+### Security Metrics
+- ✅ Zero high/critical vulnerabilities
+- ✅ 100% rate limit coverage on public endpoints
+- ✅ All external resources with SRI verification
+- ✅ Environment validation passes on all deployments
 
-### Development Velocity
-- **Build Time**: < 3 minutes for full CI/CD pipeline
-- **Review Time**: < 24 hours for standard features
-- **Deployment Frequency**: Multiple deployments per day
-- **Lead Time**: < 2 days from commit to production
-
-### Reliability Metrics
-- **Uptime**: 99.9% availability
-- **Error Rate**: < 1% runtime errors
-- **Security Issues**: 0 high/critical vulnerabilities
-- **Performance**: < 3 second initial load time
+### Performance Metrics  
+- ✅ Main bundle < 250KB gzipped
+- ✅ Cache hit ratio > 90% for static assets
+- ✅ Service worker coverage for offline functionality
+- ✅ Core Web Vitals scores > 90
 
 ---
 
-## Quick Reference Commands
-
-```bash
-# Development
-npm run dev              # Start development server
-npm run build           # Production build
-npm run test            # Run test suite
-npm run lint            # Code quality check
-
-# Container Development
-docker-compose up       # Start all services
-docker-compose down     # Stop all services
-docker exec -it app sh  # Access container shell
-
-# Quality Assurance
-npm run type-check      # TypeScript validation
-npm run test:coverage   # Coverage report
-npm run security:audit  # Security scan
-npm run performance     # Performance analysis
-
-# CI/CD
-git push origin feature/branch  # Trigger CI pipeline
-npm run validate:pipeline       # Local pipeline simulation
-```
-
-This configuration ensures **enterprise-grade code quality**, **comprehensive testing coverage**, and **automated deployment workflows** while maintaining exceptional developer experience and production reliability.
+**Configuration Version**: 2.0.0 (Audit Remediation)  
+**Last Updated**: June 29, 2025  
+**Security Audit**: Compliant with findings SEC-2025-001 through COMP-2025-001
