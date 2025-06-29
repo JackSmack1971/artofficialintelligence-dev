@@ -6,7 +6,10 @@ import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { type Plugin, defineConfig } from 'vite'
 import { imagetools } from 'vite-imagetools'
+import { VitePWA } from 'vite-plugin-pwa'
+
 const require = createRequire(import.meta.url)
+const pkg = require('./package.json')
 let compressPlugin: (() => unknown) | null = null
 if (process.env.USE_COMPRESS_PLUGIN === 'true') {
   try {
@@ -48,7 +51,26 @@ export function createDevNoncePlugin(nonce: string): Plugin {
 }
 
 export default defineConfig(({ mode }) => {
-  const plugins = [react(), imagetools()]
+  const plugins = [
+    react(),
+    imagetools(),
+    VitePWA({
+      srcDir: 'src',
+      filename: 'sw.ts',
+      strategies: 'injectManifest',
+      registerType: 'autoUpdate',
+      injectRegister: false,
+      workbox: { cacheId: `aio-${pkg.version}`, cleanupOutdatedCaches: true },
+      manifest: {
+        name: 'ArtOfficial Intelligence',
+        short_name: 'AI News',
+        start_url: '/',
+        display: 'standalone',
+        background_color: '#ffffff',
+        theme_color: '#111827'
+      }
+    })
+  ]
   if (compressPlugin) plugins.push(compressPlugin())
   if (mode === 'analyze')
     plugins.push(visualizer({ open: true, gzipSize: true, brotliSize: true }))
@@ -62,6 +84,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins,
+    define: { __APP_VERSION__: JSON.stringify(pkg.version) },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src')

@@ -8,6 +8,7 @@ import { HelmetProvider } from 'react-helmet-async'
 
 import ErrorBoundary from '@/components/ErrorBoundary'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import ServiceWorkerProvider from '@/components/ServiceWorkerProvider'
 
 import App from './App'
 
@@ -16,9 +17,11 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <ErrorBoundary>
       <HelmetProvider>
         <BrowserRouter>
-          <Suspense fallback={<LoadingSpinner />}>
-            <App />
-          </Suspense>
+          <ServiceWorkerProvider>
+            <Suspense fallback={<LoadingSpinner />}>
+              <App />
+            </Suspense>
+          </ServiceWorkerProvider>
         </BrowserRouter>
       </HelmetProvider>
     </ErrorBoundary>
