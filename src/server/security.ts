@@ -13,7 +13,7 @@ export function securityMiddleware() {
     (req: Request, res: Response, next: NextFunction) =>
       helmet.contentSecurityPolicy({
         useDefaults: false,
-        directives: createCspDirectives(res.locals.nonce as string)
+        directives: createCspDirectives(res.locals.nonce as string) as unknown as Record<string, string[]>
       })(req, res, next),
     helmet.referrerPolicy({ policy: 'no-referrer' }),
     helmet.permittedCrossDomainPolicies(),

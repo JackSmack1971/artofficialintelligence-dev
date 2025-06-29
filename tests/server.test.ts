@@ -36,6 +36,7 @@ describe('server nonce', () => {
     expect(res.text).toContain(`nonce="${nonce}"`)
     expect(csp).toContain("default-src 'self'")
     expect(csp).toContain('https://cdn.jsdelivr.net')
+    expect(csp).toContain('https://plausible.io')
     expect(csp).toContain('https://fonts.googleapis.com')
     expect(csp).toContain('https://fonts.gstatic.com')
     expect(csp).toContain('https://api.artofficial-intelligence.com')
@@ -95,7 +96,9 @@ describe('server nonce', () => {
     const nonce = csp.match(/nonce-([^';]+)/)![1]
     expect(res.text).toContain('data-domain="%VITE_PLAUSIBLE_DOMAIN%"')
     expect(res.text).toContain('src="https://plausible.io/js/script.js"')
+    expect(res.text).toContain('integrity="sha384-CDEDrer5PucbuvsrRyDyemt/nH82CYOEO7G6KNCqPoHpss5tU/bGhbY6TFdDfMqE"')
     expect(res.text).toContain(`nonce="${nonce}"`)
+    expect(res.text).toContain('onerror="loadLocalPlausible()"')
   })
 
   it('accepts CSP violation reports', async () => {
