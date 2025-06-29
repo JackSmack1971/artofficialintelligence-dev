@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url'
 import cors from 'cors'
 import express, { NextFunction, Request, Response } from 'express'
 
+import { env, loadEnv } from './config/environment.js'
 import { logger } from './lib/logger.js'
 import {
   HttpError,
@@ -14,20 +15,10 @@ import {
 import { setupRateLimiter } from './server/rateLimit.js'
 import { securityMiddleware } from './server/security.js'
 
-class ConfigurationError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'ConfigurationError'
-  }
-}
+
 
 function getAllowedOrigins(): string[] {
-  const raw = process.env.CORS_ORIGIN
-  if (!raw) throw new ConfigurationError('CORS_ORIGIN is not defined')
-  return raw
-    .split(',')
-    .map((o) => o.trim())
-    .filter(Boolean)
+  return env.CORS_ORIGIN
 }
 
 function createCorsOptions() {
@@ -50,13 +41,14 @@ function createCorsOptions() {
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export async function createServer(distDir = path.join(__dirname, '..', 'dist')) {
+  loadEnv()
   const app = express()
   app.set('trust proxy', 1)
   app.use(requestIdMiddleware())
   app.use(cors(createCorsOptions()))
 
   const enforceHttps = (req: Request, res: Response, next: NextFunction) => {
-    if (process.env.NODE_ENV === 'production' && req.protocol === 'http') {
+    if (env.NODE_ENV === 'production' && req.protocol === 'http') {
       return res.redirect(301, `https://${req.headers.host}${req.originalUrl}`)
     }
     next()
@@ -98,7 +90,8 @@ export async function createServer(distDir = path.join(__dirname, '..', 'dist'))
   return app
 }
 
-export async function startServer(port = Number(process.env.PORT) || 3000) {
+export async function startServer(port = env.PORT) {
+  loadEnv()
   const app = await createServer()
   const server = app.listen(port, () => {
     logger.info(`Server running on port ${port}`)

@@ -18,6 +18,7 @@ afterEach(async () => {
 beforeEach(() => {
   process.env.CORS_ORIGIN = 'http://localhost'
   process.env.REDIS_URL = 'redis://localhost:6379'
+  process.env.JWT_SECRET = 'a'.repeat(32)
 })
 
 describe('server nonce', () => {
@@ -145,6 +146,7 @@ describe('rate limiter', () => {
     process.env.NODE_ENV = 'production'
     process.env.CORS_ORIGIN = 'http://localhost'
     process.env.REDIS_URL = 'redis://localhost:6379'
+    process.env.JWT_SECRET = 'a'.repeat(32)
   })
 
   afterEach(() => {

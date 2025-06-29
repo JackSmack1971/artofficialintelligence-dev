@@ -46,6 +46,16 @@ Copy `.env.example` to `.env.local` and adjust values for your environment:
 cp .env.example .env.local
 ```
 
+Environment variables used by the server:
+
+| Variable | Description |
+| --- | --- |
+| `NODE_ENV` | `development`, `production`, or `test` |
+| `PORT` | Port for the Express server |
+| `CORS_ORIGIN` | Allowed origins (comma separated) |
+| `REDIS_URL` | Redis connection string |
+| `JWT_SECRET` | Secret for JWT signing (32+ characters) |
+
 `REDIS_URL` must point to your Redis instance. In production the server uses
 Redis for rate limiting so limits persist across restarts.
 

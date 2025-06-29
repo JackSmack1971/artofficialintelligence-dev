@@ -242,6 +242,12 @@ setup_environment() {
 VITE_APP_NAME=ArtOfficial Intelligence
 VITE_APP_DESCRIPTION=Your source for AI news and insights
 VITE_APP_URL=http://localhost:3000
+VITE_API_URL=http://localhost:3000
+CORS_ORIGIN=http://localhost:3000
+REDIS_URL=redis://localhost:6379
+JWT_SECRET=please-change-this-secret-1234567890123456
+PORT=3000
+NODE_ENV=development
 EOF
         print_success ".env.example created"
     fi

@@ -3,6 +3,7 @@ import RedisStore from 'rate-limit-redis'
 import { createClient } from 'redis'
 
 import { HttpError, createErrorResponse } from './errors.js'
+import { env } from '../config/environment.js'
 import { logger } from '../lib/logger.js'
 
 export class RedisConnectionError extends Error {
@@ -51,8 +52,7 @@ function denyMiddleware() {
 }
 
 export async function setupRateLimiter() {
-  const url = process.env.REDIS_URL
-  if (!url) throw new RedisConnectionError('REDIS_URL not defined')
+  const url = env.REDIS_URL
   if (!(await checkConnection(url))) return denyMiddleware()
 
   const client = newClient(url)
@@ -60,7 +60,7 @@ export async function setupRateLimiter() {
 
   return rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: process.env.NODE_ENV === 'production' ? 100 : 1000,
+    max: env.NODE_ENV === 'production' ? 100 : 1000,
     standardHeaders: true,
     legacyHeaders: false,
     store: new RedisStore({
