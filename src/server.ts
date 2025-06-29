@@ -4,9 +4,6 @@ import { fileURLToPath } from 'url'
 
 import cors from 'cors'
 import express, { NextFunction, Request, Response } from 'express'
-import rateLimit from 'express-rate-limit'
-import RedisStore from 'rate-limit-redis'
-import { createClient } from 'redis'
 
 import { logger } from './lib/logger.js'
 import {
@@ -14,6 +11,7 @@ import {
   errorHandler,
   requestIdMiddleware
 } from './server/errors.js'
+import { setupRateLimiter } from './server/rateLimit.js'
 import { securityMiddleware } from './server/security.js'
 
 class ConfigurationError extends Error {
@@ -48,44 +46,10 @@ function createCorsOptions() {
   }
 }
 
-function createRateLimiter() {
-  const options = {
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false
-  }
-
-  if (process.env.NODE_ENV === 'production') {
-    const url = process.env.REDIS_URL
-    if (url) {
-      try {
-        const client = createClient({ url })
-        client.on('error', (err) => logger.error('Redis error', err))
-        client.connect().catch((err) => {
-          logger.error('Failed to connect to Redis', err)
-        })
-
-        return rateLimit({
-          ...options,
-          store: new RedisStore({
-            sendCommand: (...args: string[]) => client.sendCommand(args)
-          })
-        })
-      } catch (err) {
-        logger.error('Redis setup failed, falling back to memory store', err as Error)
-      }
-    } else {
-      logger.error('REDIS_URL not set, using in-memory rate limiter')
-    }
-  }
-
-  return rateLimit(options)
-}
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
+export async function createServer(distDir = path.join(__dirname, '..', 'dist')) {
   const app = express()
   app.set('trust proxy', 1)
   app.use(requestIdMiddleware())
@@ -99,7 +63,8 @@ export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
   }
 
   app.use(enforceHttps)
-  app.use(createRateLimiter())
+  const limiter = await setupRateLimiter()
+  app.use(limiter)
   app.use(securityMiddleware())
 
   app.get(
@@ -133,8 +98,8 @@ export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
   return app
 }
 
-export function startServer(port = Number(process.env.PORT) || 3000) {
-  const app = createServer()
+export async function startServer(port = Number(process.env.PORT) || 3000) {
+  const app = await createServer()
   const server = app.listen(port, () => {
     logger.info(`Server running on port ${port}`)
   })
@@ -146,6 +111,8 @@ if (
   process.argv[1] &&
   path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))
 ) {
-  startServer()
+  startServer().catch((err) => {
+    logger.error('Failed to start server', err as Error)
+  })
 }
 /* c8 ignore end */

@@ -17,6 +17,7 @@ afterEach(async () => {
 
 beforeEach(() => {
   process.env.CORS_ORIGIN = 'http://localhost'
+  process.env.REDIS_URL = 'redis://localhost:6379'
 })
 
 describe('server nonce', () => {
@@ -26,7 +27,7 @@ describe('server nonce', () => {
       path.join(tmpDir, 'index.html'),
       '<!DOCTYPE html><script nonce="__CSP_NONCE__"></script>'
     )
-    const app = createServer(tmpDir)
+    const app = await createServer(tmpDir)
     const res = await request(app).get('/')
     expect(res.status).toBe(200)
     expect(res.headers['x-correlation-id']).toBeTruthy()
@@ -45,7 +46,7 @@ describe('server nonce', () => {
 
   it('returns 500 when index load fails', async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'nonce-test-'))
-    const app = createServer(tmpDir)
+    const app = await createServer(tmpDir)
     const res = await request(app).get('/')
     expect(res.status).toBe(500)
     expect(res.body.success).toBe(false)
@@ -53,14 +54,14 @@ describe('server nonce', () => {
   })
 
   it('startServer returns http.Server', async () => {
-    const server = startServer(0)
+    const server = await startServer(0)
     expect(server).toBeTruthy()
     await new Promise((resolve) => server.close(resolve))
   })
 
   it('logs server start', async () => {
     const spy = vi.spyOn(logger, 'info').mockImplementation(() => {})
-    const server = startServer(0)
+    const server = await startServer(0)
     await new Promise((r) => setTimeout(r, 20))
     expect(spy).toHaveBeenCalledWith(expect.stringContaining('Server running'))
     server.close()
@@ -74,7 +75,7 @@ describe('server nonce', () => {
       'utf8'
     )
     await fs.writeFile(path.join(tmpDir, 'index.html'), rootIndex)
-    const app = createServer(tmpDir)
+    const app = await createServer(tmpDir)
     const res = await request(app).get('/')
     expect(res.status).toBe(200)
     const csp = res.headers['content-security-policy'] as string
@@ -92,7 +93,7 @@ describe('server nonce', () => {
       'utf8'
     )
     await fs.writeFile(path.join(tmpDir, 'index.html'), rootIndex)
-    const app = createServer(tmpDir)
+    const app = await createServer(tmpDir)
     const res = await request(app).get('/')
     expect(res.status).toBe(200)
     const csp = res.headers['content-security-policy'] as string
@@ -107,7 +108,7 @@ describe('server nonce', () => {
   it('accepts CSP violation reports', async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'nonce-test-'))
     await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
-    const app = createServer(tmpDir)
+    const app = await createServer(tmpDir)
     const res = await request(app)
       .post('/csp-report')
       .set('Content-Type', 'application/csp-report')
@@ -118,7 +119,7 @@ describe('server nonce', () => {
   it('sets security headers', async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'nonce-test-'))
     await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
-    const app = createServer(tmpDir)
+    const app = await createServer(tmpDir)
     const res = await request(app).get('/')
     validateSecurityHeaders(res.headers as Record<string, string>)
   })
@@ -132,7 +133,7 @@ describe('server nonce', () => {
     process.env.CORS_ORIGIN = 'http://allowed.com'
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'nonce-test-'))
     await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
-    const app = createServer(tmpDir)
+    const app = await createServer(tmpDir)
     const res = await request(app).get('/').set('Origin', 'http://bad.com')
     expect(res.status).toBe(403)
     expect(res.body.error.code).toBe('INVALID_ORIGIN')
@@ -150,23 +151,25 @@ describe('rate limiter', () => {
     vi.resetModules()
   })
 
-  it('limits repeated requests using redis-mock', async () => {
+  it('persists counts across restarts using redis-mock', async () => {
     vi.mock('redis', async () => {
       const redis = await import('redis-mock')
-      return { createClient: () => redis.createClient() }
+      const client = redis.createClient()
+      return { createClient: () => client }
     })
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'rl-redis-'))
     await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
     const { createServer: create } = await import('../src/server')
-    const app = create(tmpDir)
+    const app1 = await create(tmpDir)
     for (let i = 0; i < 100; i++) {
-      await request(app).get('/').set('X-Forwarded-Proto', 'https')
+      await request(app1).get('/').set('X-Forwarded-Proto', 'https')
     }
-    const res = await request(app).get('/').set('X-Forwarded-Proto', 'https')
+    const app2 = await create(tmpDir)
+    const res = await request(app2).get('/').set('X-Forwarded-Proto', 'https')
     expect(res.status).toBe(429)
   })
 
-  it('falls back to memory store when redis fails', async () => {
+  it('denies requests when redis fails', async () => {
     vi.mock('redis', () => ({
       createClient: () => ({
         connect: () => Promise.reject(new Error('fail')),
@@ -175,15 +178,12 @@ describe('rate limiter', () => {
       })
     }))
     const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {})
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'rl-fallback-'))
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'rl-fail-'))
     await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
     const { createServer: create } = await import('../src/server')
-    const app = create(tmpDir)
-    for (let i = 0; i < 100; i++) {
-      await request(app).get('/').set('X-Forwarded-Proto', 'https')
-    }
-    const res = await request(app).get('/').set('X-Forwarded-Proto', 'https')
-    expect(res.status).toBe(429)
+    const app = await create(tmpDir)
+    const res = await request(app).get('/')
+    expect(res.status).toBe(503)
     expect(errorSpy).toHaveBeenCalled()
     errorSpy.mockRestore()
   })
