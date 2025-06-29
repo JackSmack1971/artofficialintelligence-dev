@@ -27,10 +27,14 @@ import { Redis } from 'ioredis';
 const createRedisClient = () => {
   const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
   return new Redis(redisUrl, {
-    retryDelayOnFailover: 100,
     maxRetriesPerRequest: 3,
     connectTimeout: 10000,
     commandTimeout: 5000,
+    enableOfflineQueue: false, // Do not queue commands when offline
+    retryStrategy: (times) => {
+      const delay = Math.min(times * 100, 2000); // Exponential backoff up to 2 seconds
+      return delay;
+    },
   });
 };
 
