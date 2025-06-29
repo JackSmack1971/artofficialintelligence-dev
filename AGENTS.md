@@ -72,22 +72,36 @@ src/
 
 ### Code Quality Requirements
 ```typescript
-// Import order (enforced by ESLint)
-// 1. React and React-related
-import React, { useState, useEffect } from 'react'
+// Enforced by ESLint (see .eslintrc.cjs for full configuration)
+// The 'import/order' rule from 'eslint-plugin-import' is used to enforce this.
+//
+// Rules:
+// - Built-in modules (e.g., 'react', 'react-dom', 'react-router-dom') first.
+// - External (third-party) modules next, alphabetized.
+// - Internal modules (aliased with '@/' or '@/components/') after external, alphabetized.
+// - Parent, sibling, and index imports follow, alphabetized.
+// - Type-only imports last.
+// - Newlines between import groups.
+
+// Example:
+
+// 1. Built-in / React-related
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter } from 'react-router-dom';
 
 // 2. Third-party libraries (alphabetical)
-import { clsx } from 'clsx'
-import { motion } from 'framer-motion'
+import { clsx } from 'clsx';
+import { motion } from 'framer-motion';
 
-// 3. Internal components
-import { Button } from '@/components/ui/button'
+// 3. Internal components and utilities
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-// 4. Internal utilities  
-import { cn } from '@/lib/utils'
+// 4. Relative imports (parent, sibling, index)
+import { SomeComponent } from './SomeComponent';
 
 // 5. Type-only imports (last)
-import type { ComponentProps } from '@/types'
+import type { ComponentProps } from '@/types';
 ```
 
 ### Component Standards
@@ -100,14 +114,43 @@ import type { ComponentProps } from '@/types'
 ### Testing Requirements
 ```typescript
 // Every component must have tests
-// File: ComponentName.test.tsx
-import { render, screen } from '@testing-library/react'
-import { ComponentName } from './ComponentName'
+// File: ComponentName.test.tsx (or similar, e.g., __tests__/ComponentName.test.tsx)
 
-test('renders component correctly', () => {
-  render(<ComponentName />)
-  expect(screen.getByRole('...')).toBeInTheDocument()
-})
+import '@testing-library/jest-dom'; // For extended Jest/Vitest matchers
+import { render, fireEvent, screen } from '@testing-library/react';
+import * as React from 'react'; // Explicit React import for JSX
+
+// Example Component (for demonstration purposes)
+function HiddenMessage({ children }: { children: React.ReactNode }) {
+  const [showMessage, setShowMessage] = React.useState(false);
+  return (
+    <div>
+      <label htmlFor="toggle">Show Message</label>
+      <input
+        id="toggle"
+        type="checkbox"
+        onChange={e => setShowMessage(e.target.checked)}
+        checked={showMessage}
+      />
+      {showMessage ? children : null}
+    </div>
+  );
+}
+
+// Example Test Case
+test('shows the children when the checkbox is checked', () => {
+  const testMessage = 'Test Message';
+  render(<HiddenMessage>{testMessage}</HiddenMessage>);
+
+  // Use query* functions for elements that might not be present initially
+  expect(screen.queryByText(testMessage)).toBeNull();
+
+  // Simulate user interaction
+  fireEvent.click(screen.getByLabelText(/show/i));
+
+  // Use get* functions for elements expected to be in the document
+  expect(screen.getByText(testMessage)).toBeInTheDocument();
+});
 ```
 
 ## Security Implementation (Critical)
@@ -115,29 +158,34 @@ test('renders component correctly', () => {
 ### Content Security Policy
 ```typescript
 // All routes must implement CSP headers
+// Ensure dynamic generation of 'sha256-HASH' for inline scripts.
+// In production, consider stricter 'styleSrc' policies than 'unsafe-inline'.
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'sha256-HASH'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "'sha256-HASH'"], // Replace HASH with actual SHA-256 hash of inline scripts
+      styleSrc: ["'self'", "'unsafe-inline'"], // Consider stricter policies for production
       imgSrc: ["'self'", "data:", "https:"],
+      // Add other directives as needed (e.g., connectSrc, fontSrc, frameSrc, etc.)
     },
   },
-}))
+}));
 ```
 
 ### Rate Limiting (Required)
 ```typescript
 // Redis-backed rate limiting for all API routes
-import rateLimit from 'express-rate-limit'
-import RedisStore from 'rate-limit-redis'
+import rateLimit from 'express-rate-limit';
+import RedisStore from 'rate-limit-redis';
 
 const limiter = rateLimit({
   store: new RedisStore({ client: redisClient }),
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // requests per window
-})
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  standardHeaders: 'draft-8', // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+});
 ```
 
 ## Performance Standards
@@ -150,21 +198,26 @@ const limiter = rateLimit({
 
 ### Code Splitting Pattern
 ```typescript
-// Route-level splitting (required)
-const HomePage = lazy(() => import('@/pages/Home'))
-const ArticlesPage = lazy(() => import('@/pages/Articles'))
+// Route-level splitting (required, using React Router's lazy loading)
+import { createBrowserRouter, lazy } from 'react-router-dom';
+
+const router = createBrowserRouter([
+  { path: '/', lazy: () => import('@/pages/Home') },
+  { path: '/articles', lazy: () => import('@/pages/Articles') },
+  // ... other routes
+]);
 
 // Component-level splitting for heavy features
-const NewsletterWidget = lazy(() => 
+const NewsletterWidget = lazy(() =>
   import('@/components/features/Newsletter')
-)
+);
 ```
 
 ## Validation & CI/CD
 
 ### Pre-Commit Validation
 ```bash
-# Automated via Husky (runs on every commit)
+# Automated via Husky (runs on every commit, configured in .husky/pre-commit)
 pnpm lint                     # ESLint + TypeScript
 pnpm test                     # All tests with coverage
 pnpm build                    # Production build verification
@@ -190,6 +243,7 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
+      - run: pnpm audit # Add security audit to CI pipeline
 ```
 
 ## Pull Request Guidelines
