@@ -95,3 +95,4 @@ All source files follow a standard import order enforced by ESLint:
 6. Type-only imports (last)
 
 Refer to [docs/import-ordering.md](docs/import-ordering.md) for more information.
+\n## PWA Caching\nService worker caches are versioned using the package version. Old caches are automatically cleaned with Workbox's cleanupOutdatedCaches.
