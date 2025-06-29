@@ -1,8 +1,9 @@
 import '@testing-library/jest-dom/vitest'
-import { render, waitFor } from './utils/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import SEOHead from '@/components/SEOHead'
+
+import { render, waitFor } from './utils/test-utils'
 
 describe('SEOHead', () => {
   it('sets title and description meta', async () => {

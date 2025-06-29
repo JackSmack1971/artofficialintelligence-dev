@@ -131,3 +131,53 @@ describe('server nonce', () => {
     expect(res.status).toBe(500)
   })
 })
+
+describe('rate limiter', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'production'
+    process.env.CORS_ORIGIN = 'http://localhost'
+    process.env.REDIS_URL = 'redis://localhost:6379'
+  })
+
+  afterEach(() => {
+    vi.resetModules()
+  })
+
+  it('limits repeated requests using redis-mock', async () => {
+    vi.mock('redis', async () => {
+      const redis = await import('redis-mock')
+      return { createClient: () => redis.createClient() }
+    })
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'rl-redis-'))
+    await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
+    const { createServer: create } = await import('../src/server')
+    const app = create(tmpDir)
+    for (let i = 0; i < 100; i++) {
+      await request(app).get('/').set('X-Forwarded-Proto', 'https')
+    }
+    const res = await request(app).get('/').set('X-Forwarded-Proto', 'https')
+    expect(res.status).toBe(429)
+  })
+
+  it('falls back to memory store when redis fails', async () => {
+    vi.mock('redis', () => ({
+      createClient: () => ({
+        connect: () => Promise.reject(new Error('fail')),
+        on: () => {},
+        sendCommand: () => Promise.reject(new Error('fail'))
+      })
+    }))
+    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {})
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'rl-fallback-'))
+    await fs.writeFile(path.join(tmpDir, 'index.html'), '<!doctype html>')
+    const { createServer: create } = await import('../src/server')
+    const app = create(tmpDir)
+    for (let i = 0; i < 100; i++) {
+      await request(app).get('/').set('X-Forwarded-Proto', 'https')
+    }
+    const res = await request(app).get('/').set('X-Forwarded-Proto', 'https')
+    expect(res.status).toBe(429)
+    expect(errorSpy).toHaveBeenCalled()
+    errorSpy.mockRestore()
+  })
+})

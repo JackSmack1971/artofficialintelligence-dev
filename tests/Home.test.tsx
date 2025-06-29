@@ -1,8 +1,9 @@
 import '@testing-library/jest-dom/vitest'
-import { render, screen, waitFor } from './utils/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import Home from '@/pages/Home'
+
+import { render, screen, waitFor } from './utils/test-utils'
 
 const mockArticles = [
   {

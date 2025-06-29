@@ -5,9 +5,10 @@ import { fileURLToPath } from 'url'
 import cors from 'cors'
 import express, { NextFunction, Request, Response } from 'express'
 import rateLimit from 'express-rate-limit'
+import RedisStore from 'rate-limit-redis'
+import { createClient } from 'redis'
 
 import { logger } from './lib/logger.js'
-
 import { securityMiddleware } from './server/security.js'
 
 class ConfigurationError extends Error {
@@ -42,6 +43,41 @@ function createCorsOptions() {
   }
 }
 
+function createRateLimiter() {
+  const options = {
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    const url = process.env.REDIS_URL
+    if (url) {
+      try {
+        const client = createClient({ url })
+        client.on('error', (err) => logger.error('Redis error', err))
+        client.connect().catch((err) => {
+          logger.error('Failed to connect to Redis', err)
+        })
+
+        return rateLimit({
+          ...options,
+          store: new RedisStore({
+            sendCommand: (...args: string[]) => client.sendCommand(args)
+          })
+        })
+      } catch (err) {
+        logger.error('Redis setup failed, falling back to memory store', err as Error)
+      }
+    } else {
+      logger.error('REDIS_URL not set, using in-memory rate limiter')
+    }
+  }
+
+  return rateLimit(options)
+}
+
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
@@ -57,19 +93,11 @@ export function createServer(distDir = path.join(__dirname, '..', 'dist')) {
   }
 
   app.use(enforceHttps)
-
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false
-  })
-
+  app.use(createRateLimiter())
   app.use(securityMiddleware())
 
   app.get(
     '/',
-    limiter,
     async (_req: Request, res: Response, next: NextFunction) => {
       try {
         const indexPath = path.join(distDir, 'index.html')
