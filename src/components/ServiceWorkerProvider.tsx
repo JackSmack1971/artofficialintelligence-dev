@@ -40,7 +40,9 @@ export const ServiceWorkerProvider: React.FC<Props> = ({ children }) => {
       reg = r
     })
     return () => {
-      reg?.unregister().catch(() => {})
+      if (reg && typeof reg.unregister === 'function') {
+        reg.unregister().catch(() => {})
+      }
     }
   }, [])
   const reload = (): void => {
